@@ -6,9 +6,13 @@ import os
 import tomllib
 from pathlib import Path
 
+from dotenv import load_dotenv
 from pydantic import BaseModel, Field
 
 from my_feed.models import SourceName
+
+# Load .env file from current directory or parent directories
+load_dotenv()
 
 DEFAULT_CONFIG_PATH = Path("config.toml")
 LOCAL_CONFIG_PATH = Path("config.local.toml")

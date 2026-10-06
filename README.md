@@ -33,14 +33,25 @@ uv run my-feed serve
 Gemini 3.5 Flash を使った記事要約が利用可能です：
 
 1. **APIキーの取得**: [Google AI Studio](https://aistudio.google.com/apikey) で無料取得
-2. **環境変数の設定**:
+
+2. **環境変数の設定**（2つの方法）:
+   
+   **方法A: .env ファイル（推奨）**
    ```bash
-   export GEMINI_API_KEY="your-api-key-here"
+   cp .env.example .env
+   # .env ファイルを編集してAPIキーを設定
    ```
-   または `.env` ファイルを作成（`.gitignore` 済み）:
+   
+   `.env` の内容:
    ```
    GEMINI_API_KEY=your-api-key-here
    ```
+   
+   **方法B: export コマンド**
+   ```bash
+   export GEMINI_API_KEY="your-api-key-here"
+   ```
+
 3. **設定ファイル**: `config.local.toml` で `[summarizer] enabled = true`（example の初期値）
 
 **コスト**: 1記事あたり約0.05円、10記事で約0.5円（無料枠でも実用的）
