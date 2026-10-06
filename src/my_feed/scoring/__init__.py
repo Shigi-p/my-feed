@@ -4,9 +4,15 @@ from __future__ import annotations
 
 from my_feed.scoring.base import ScoreStrategy
 from my_feed.scoring.fake import FakeScoreStrategy
+from my_feed.scoring.hybrid import HybridScoreStrategy
+from my_feed.scoring.popularity import PopularityScoreStrategy
+from my_feed.scoring.recency import RecencyScoreStrategy
 
 _REGISTRY: dict[str, ScoreStrategy] = {
     "fake": FakeScoreStrategy(),
+    "popularity": PopularityScoreStrategy(),
+    "recency": RecencyScoreStrategy(),
+    "hybrid": HybridScoreStrategy(),
 }
 
 
