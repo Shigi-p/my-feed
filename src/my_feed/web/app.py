@@ -32,6 +32,8 @@ def create_app(deps: WebDeps | None = None) -> FastAPI:
     """
     deps = deps or create_default_web_deps()
     templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
+    # Item IDs may contain ``/`` (e.g. github_trending:owner/repo); encode for hrefs.
+    templates.env.filters["path_quote"] = lambda value: quote(str(value), safe="")
     app = FastAPI(title="my feed", docs_url=None, redoc_url=None)
     app.state.deps = deps
 
@@ -140,8 +142,10 @@ def create_app(deps: WebDeps | None = None) -> FastAPI:
             },
         )
 
-    @app.get("/runs/{run_id}/items/{item_id}/markdown")
+    @app.get("/runs/{run_id}/items/{item_id:path}/markdown")
     async def download_single(run_id: str, item_id: str) -> Response:
+        # ``:path`` so IDs with ``/`` (GitHub owner/repo) match; clients should
+        # still send percent-encoded segments when building URLs.
         result = deps.run_store.get_run(run_id)
         if result is None:
             raise HTTPException(status_code=404, detail="run not found")

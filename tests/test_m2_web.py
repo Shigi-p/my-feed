@@ -115,6 +115,61 @@ def test_source_errors_rendered_on_run_detail():
     assert "partial" in detail.text
 
 
+def test_single_markdown_with_slash_in_item_id():
+    """GitHub Trending IDs look like ``github_trending:owner/repo``."""
+    from urllib.parse import quote
+
+    gh_id = "github_trending:DuarteSantos8/openGym"
+    result = PipelineResult(
+        items=[
+            ScoredItem(
+                item=Item(
+                    id=gh_id,
+                    source=SourceName.GITHUB_TRENDING,
+                    title="openGym",
+                    url="https://github.com/DuarteSantos8/openGym",
+                    published_at=datetime(2026, 10, 6, tzinfo=UTC),
+                    excerpt="repo",
+                    tags=["Python"],
+                    metrics={"stars_today": 10},
+                    fetched_at=datetime(2026, 10, 6, tzinfo=UTC),
+                ),
+                score=0.9,
+                score_breakdown={},
+            )
+        ],
+        scorer="hybrid",
+        fetched_at=datetime(2026, 10, 6, tzinfo=UTC),
+        source_errors={},
+        status=PipelineStatus.OK,
+    )
+
+    deps = WebDeps(
+        run_store=InMemoryRunStore(),
+        favorite_store=InMemoryFavoriteStore(),
+        run_pipeline_fn=lambda _c: result,
+        load_config_fn=lambda _path=None: AppConfig(
+            top_n=10,
+            default_scorer="hybrid",
+            enabled_sources=[SourceName.GITHUB_TRENDING],
+        ),
+        config_path=Path("config.toml"),
+    )
+    client = TestClient(create_app(deps))
+    create = client.post("/runs", data={"scorer": "hybrid"}, follow_redirects=False)
+    run_id = create.headers["location"].rsplit("/", 1)[-1]
+
+    detail = client.get(f"/runs/{run_id}")
+    assert detail.status_code == 200
+    encoded = quote(gh_id, safe="")
+    assert f"/runs/{run_id}/items/{encoded}/markdown" in detail.text
+
+    md = client.get(f"/runs/{run_id}/items/{encoded}/markdown")
+    assert md.status_code == 200
+    assert "openGym" in md.text
+    assert "attachment" in md.headers.get("content-disposition", "")
+
+
 def test_fetch_form_defaults_to_hybrid_when_no_result():
     deps = WebDeps(
         run_store=InMemoryRunStore(),
