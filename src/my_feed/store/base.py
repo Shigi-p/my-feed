@@ -1,6 +1,11 @@
 """Persistence contracts (Protocol only).
 
-In-memory fakes: ``store.memory``. SQLite backends: ``store.sqlite`` (T-Store).
+In-memory fakes: ``store.memory``. SQLite backends: ``store.sqlite``.
+
+``FavoriteStore.remove`` takes a *favorite* id (returned by ``add``), not
+``Item.id``. Callers that only have ``Item.id`` should use
+``favorite_id_for`` first — Web/UI must not invent a second mapping via
+write-on-read side effects.
 """
 
 from __future__ import annotations
@@ -32,3 +37,7 @@ class FavoriteStore(Protocol):
     def list(self) -> list[Item]: ...
 
     def remove(self, favorite_id: str) -> None: ...
+
+    def favorite_id_for(self, item_id: str) -> str | None:
+        """Read-only lookup of favorite id by ``Item.id`` (no writes)."""
+        ...

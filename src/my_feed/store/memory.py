@@ -26,7 +26,11 @@ class InMemoryRunStore:
 
 
 class InMemoryFavoriteStore:
-    """C0 / T-Web Fake store."""
+    """C0 / T-Web Fake store.
+
+    Keeps both favorite_id → Item and item.id → favorite_id so UI can resolve
+    delete targets without calling ``add`` on every page render.
+    """
 
     def __init__(self) -> None:
         self._items: dict[str, Item] = {}
@@ -51,3 +55,6 @@ class InMemoryFavoriteStore:
         item = self._items.pop(favorite_id, None)
         if item is not None:
             self._ids_by_item.pop(item.id, None)
+
+    def favorite_id_for(self, item_id: str) -> str | None:
+        return self._ids_by_item.get(item_id)
