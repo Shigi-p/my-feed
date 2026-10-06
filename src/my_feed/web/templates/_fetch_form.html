@@ -2,8 +2,9 @@
   <label>
     スコアラー
     <select name="scorer">
+      {% set selected = (result.scorer if result else default_scorer) | default("hybrid") %}
       {% for name in scorers %}
-      <option value="{{ name }}" {% if result and result.scorer == name %}selected{% endif %}>{{ name }}</option>
+      <option value="{{ name }}" {% if name == selected %}selected{% endif %}>{{ name }}</option>
       {% endfor %}
     </select>
   </label>

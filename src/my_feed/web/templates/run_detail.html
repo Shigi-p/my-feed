@@ -5,6 +5,13 @@
 <p class="muted">
   {{ result.fetched_at }} · scorer {{ result.scorer }} · status {{ result.status.value }} · {{ result.items|length }} 件
 </p>
+{% if result.source_errors %}
+<ul class="source-errors">
+  {% for src, msg in result.source_errors.items() %}
+  <li><strong>{{ src }}</strong>: {{ msg }}</li>
+  {% endfor %}
+</ul>
+{% endif %}
 {% include "_fetch_form.html" %}
 <div class="toolbar">
   <a class="btn primary" href="/runs/{{ run_id }}/markdown">Markdown DL</a>

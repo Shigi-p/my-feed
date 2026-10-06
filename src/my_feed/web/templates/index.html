@@ -2,13 +2,23 @@
 {% block title %}my feed{% endblock %}
 {% block content %}
 <h1>いまの Top {{ result.items|length if result else 10 }}</h1>
-<p class="muted">ローカル専用。C0 Fake ソース／スコアラーで取得します。</p>
+<p class="muted">ローカル専用（認証なし）。設定: <code>{{ config_path }}</code></p>
+{% if using_fake_only %}
+<p class="muted">いまは <code>fake</code> ソースのみです。実取得するなら <code>cp config.example.toml config.local.toml</code> のあと再起動。</p>
+{% endif %}
 {% include "_fetch_form.html" %}
 {% if run_id and result %}
 <div class="toolbar">
   <a class="btn primary" href="/runs/{{ run_id }}/markdown">Markdown DL</a>
   <span class="muted">run {{ run_id }} · {{ result.fetched_at }} · {{ result.status.value }}</span>
 </div>
+{% if result.source_errors %}
+<ul class="source-errors">
+  {% for src, msg in result.source_errors.items() %}
+  <li><strong>{{ src }}</strong>: {{ msg }}</li>
+  {% endfor %}
+</ul>
+{% endif %}
 {% endif %}
 {% include "_item_list.html" %}
 {% endblock %}

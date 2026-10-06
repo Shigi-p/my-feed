@@ -39,18 +39,22 @@ CREATE INDEX IF NOT EXISTS idx_favorites_saved_at ON favorites (saved_at DESC);
 """
 
 
-def connect(db_path: Path | str | None = None) -> sqlite3.Connection:
+def connect(
+    db_path: Path | str | None = None,
+    *,
+    check_same_thread: bool = True,
+) -> sqlite3.Connection:
     """Open a SQLite connection and ensure schema exists.
 
     Lifecycle note (M2 / T-Web): the returned connection is owned by the caller.
-    Default sqlite3 connections are not safely shared across threads; prefer one
-    connection per request/thread, or ``check_same_thread=False`` with an
-    explicit lock if you must share. Factories below do not close the connection
-    — call ``conn.close()`` when the process/app shuts down.
+    Default sqlite3 connections are not safely shared across threads. For the
+    local FastAPI UI (TestClient / threadpool), pass ``check_same_thread=False``
+    via ``open_sqlite_stores``. Factories do not close the connection — call
+    ``conn.close()`` when the process/app shuts down.
     """
     path = Path(db_path) if db_path is not None else DEFAULT_DB_PATH
     path.parent.mkdir(parents=True, exist_ok=True)
-    conn = sqlite3.connect(path)
+    conn = sqlite3.connect(path, check_same_thread=check_same_thread)
     conn.row_factory = sqlite3.Row
     ensure_schema(conn)
     return conn
@@ -183,11 +187,14 @@ def create_sqlite_favorite_store(
 
 def open_sqlite_stores(
     db_path: Path | str | None = None,
+    *,
+    check_same_thread: bool = False,
 ) -> tuple[SQLiteRunStore, SQLiteFavoriteStore]:
     """Factory: shared connection for both stores (handy for T-Web wiring).
 
-    Shares one connection — see ``connect`` lifecycle notes before using from
-    a multi-threaded web server.
+    Defaults to ``check_same_thread=False`` so FastAPI TestClient / local
+    serve can touch the same connection from worker threads. Single-process
+    local use only — not a multi-writer production pool.
     """
-    conn = connect(db_path)
+    conn = connect(db_path, check_same_thread=check_same_thread)
     return SQLiteRunStore(conn), SQLiteFavoriteStore(conn)

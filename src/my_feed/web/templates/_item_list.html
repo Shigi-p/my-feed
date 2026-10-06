@@ -1,5 +1,5 @@
 {% if not result or not result.items %}
-<p class="muted">まだ取得結果がありません。「いま取得」で Fake パイプラインを実行します。</p>
+<p class="muted">まだ取得結果がありません。「いま取得」でパイプラインを実行します。</p>
 {% else %}
 <ol class="feed">
   {% for scored in result.items %}
@@ -25,7 +25,7 @@
         <button type="submit" class="ghost">お気に入り</button>
       </form>
       {% endif %}
-      <a class="btn ghost" href="/runs/{{ run_id }}/items/{{ item.id }}/markdown">MD</a>
+      <a class="btn ghost" href="/runs/{{ run_id }}/items/{{ item.id|path_quote }}/markdown">MD</a>
     </div>
   </li>
   {% endfor %}
