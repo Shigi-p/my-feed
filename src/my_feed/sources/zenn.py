@@ -1,4 +1,10 @@
-"""Zenn source adapter — public JSON API (likes included)."""
+"""Zenn source adapter — public JSON API (likes included).
+
+Fetch path trade-off: Zenn RSS omits like counts, so we use the unofficial
+web JSON API (``/api/articles``) that the Zenn site itself calls. That buys
+``liked_count`` for scoring at the cost of higher breakage / ToS risk than
+RSS. If the API disappears, fall back to RSS and accept empty metrics.
+"""
 
 from __future__ import annotations
 

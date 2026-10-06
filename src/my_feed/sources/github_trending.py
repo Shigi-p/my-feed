@@ -4,6 +4,10 @@ GitHub does not provide an official Trending API. This module scrapes
 ``https://github.com/trending`` and is intentionally isolated so HTML
 breakage cannot affect other adapters' tests or imports beyond registry
 wiring.
+
+Fragility: fixtures freeze today's markup; production DOM drift will empty
+or mis-parse until regexes are updated. Prefer keeping all HTML assumptions
+inside this file only.
 """
 
 from __future__ import annotations

@@ -1,4 +1,9 @@
-"""Qiita source adapter — public API v2 (no token for public GET)."""
+"""Qiita source adapter — public API v2 (no token for public GET).
+
+Unauthenticated rate limits are tight. Rapid “いま取得” clicks can surface as
+``source_errors`` without retries/backoff (not implemented yet). A personal
+token later would raise limits; keep token optional and out of default config.
+"""
 
 from __future__ import annotations
 

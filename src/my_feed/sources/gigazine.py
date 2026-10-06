@@ -118,6 +118,11 @@ def _parse_one(raw: Any, *, fetched_at: datetime) -> Item:
 
 
 def _official_id(raw: Any, url: str) -> str | None:
+    """Stable key from URL/guid slug (``/news/<slug>/``).
+
+    Favorites depend on this staying stable across refetches. If GIGAZINE
+    changes URL shape, slug extraction may yield a new id and orphan saves.
+    """
     guid = getattr(raw, "id", None) or getattr(raw, "guid", None)
     if isinstance(guid, str) and guid.strip():
         match = _SLUG_RE.search(guid)
