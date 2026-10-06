@@ -1,4 +1,4 @@
-"""CLI entrypoint for my-feed (C0: fake pipeline)."""
+"""CLI entrypoint for my-feed (M1: config-driven real or fake pipeline)."""
 
 from __future__ import annotations
 
@@ -15,7 +15,7 @@ from my_feed.pipeline import run_pipeline
 from my_feed.scoring import list_scorers
 from my_feed.sources import list_sources
 
-app = typer.Typer(help="my-feed: tech catch-up feed (C0 contract hub)", no_args_is_help=True)
+app = typer.Typer(help="my-feed: tech catch-up feed", no_args_is_help=True)
 
 
 @app.command("run")
@@ -29,7 +29,7 @@ def run_cmd(
         Optional[Path], typer.Option("--out-md", help="Write Gemini-ready markdown")
     ] = None,
 ) -> None:
-    """Fetch → score → top N (Fake sources/scorer in C0)."""
+    """Fetch → score → top N (sources/scorer from config.toml or flags)."""
     config = load_config(config_path)
     if top is not None:
         config = config.model_copy(update={"top_n": top})

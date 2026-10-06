@@ -2,7 +2,8 @@
 
 | 項目 | 内容 |
 |------|------|
-| 依存 | C0 + **T-Src** + **T-Score** |
+| ステータス | **完了**（ブランチ `cursor/m1-cli-bcb5`） |
+| 依存 | C0 + **T-Src** + **T-Score**（いずれも `main` 合流済み） |
 | 後続 | M2 |
 | ゴール | 1 コマンドで実ソース取得 → スコア → Top 10 が再現可能に出る |
 
@@ -48,35 +49,34 @@ load config
 
 ### T1. 配線
 
-- [ ] registry から実ソース・実スコアを解決
-- **完了**: Fake 無しでも `run_pipeline` が動く
+- [x] registry から実ソース・実スコアを解決
+- **完了**: Fake 無しでも `run_pipeline` が動く（ルート設定は offline 用に `fake` 維持。実運用は `config.example.toml`）
 
 ### T2. CLI UX
 
-- [ ] `--scorer` / `--top` / `--json` / `--out`
+- [x] `--scorer` / `--top` / `--json` / `--out`（＋ `--config` / `--out-md`）
 - **完了**: フラグがドキュメントどおり
 
 ### T3. 手動確認
 
-- [ ] 全ソース有効で 10 件
-- [ ] scorer 切替
-- [ ] Trending 障害 or disable でも全体成功
+- [x] 全ソース有効で 10 件（live / `MY_FEED_LIVE`）
+- [x] scorer 切替（結合テスト + CLI）
+- [x] Trending 障害 or disable でも全体成功（結合テストで simulated outage）
 - **完了**: README の確認節が実行可能
 
 ---
 
 ## 5. 完了条件（Exit Criteria）
 
-- [ ] ローカル 1 コマンドで実 Top 10
-- [ ] スコアラー切替可
-- [ ] ソース追加が「Adapter + 登録 + 設定」で済むことが維持されている
-- [ ] partial 失敗がログ / `source_errors` に残る
-- [ ] T-Web が同じ `run_pipeline` を後で呼べる
+- [x] ローカル 1 コマンドで実 Top 10（`cp config.example.toml config.local.toml` → `my-feed run --config ...`）
+- [x] スコアラー切替可
+- [x] ソース追加が「Adapter + 登録 + 設定」で済むことが維持されている
+- [x] partial 失敗がログ / `source_errors` に残る
+- [x] T-Web が同じ `run_pipeline` を後で呼べる（既存）
 
 ---
 
 ## 6. worktree
 
-- `cursor/m1-cli-<suffix>`
-- T-Src / T-Score がそれぞれマージ可能になってからが安全  
-  （または integration ブランチで両方を取り込む）
+- `cursor/m1-cli-bcb5`
+- T-Src / T-Score は `main` 合流後に着手

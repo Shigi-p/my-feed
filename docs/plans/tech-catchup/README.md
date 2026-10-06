@@ -27,8 +27,9 @@
 | [tracks/](./tracks/README.md) | T-Src / T-Score / T-Md / T-Web / T-Store |
 | [milestones/](./milestones/README.md) | M1〜M4 合流点 |
 | [../../guides/pr-review.md](../../guides/pr-review.md) | PR レビュー観点（草案） |
+| [../../guides/collaboration.md](../../guides/collaboration.md) | 協働・方針メモ（草案） |
 
 ## 現在の位置
 
-**計画レビュー（本 PR）** → マージ後は **C0（契約ハブ）** から着手  
-C0 完了後、T-Src / T-Score / T-Md / **T-Web** / T-Store を並行 worktree で開始してよい
+**M1 完了**（CLI で実ソース Top 10）。次は **M2（ローカル完成）** — Web の本番配線と SQLite。  
+トラック（T-Src / T-Score / T-Md / T-Web / T-Store）と C0 は `main` 合流済み。

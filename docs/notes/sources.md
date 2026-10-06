@@ -20,18 +20,21 @@ Short notes on fetch paths chosen for each `SourceAdapter`. Default
 
 ## Enabling real sources
 
-Example `config.toml` snippet (keep `fake` only if you want offline demos):
+Prefer the checked-in example (keeps root `config.toml` offline-safe):
 
-```toml
-top_n = 10
-default_scorer = "fake"
-enabled_sources = ["zenn", "qiita", "gigazine", "github_trending"]
+```bash
+cp config.example.toml config.local.toml
+uv run my-feed run --config config.local.toml
 ```
+
+Or paste the same keys into a local override. Details: README「M1: 実ソースで CLI Top 10」。
 
 ## Live smoke (optional)
 
-CI tests use fixtures only (no network). To hit live endpoints locally:
+CI / default pytest use fixtures only (no network). To hit live endpoints:
 
 ```bash
 MY_FEED_LIVE=1 uv run pytest -m network
+# M1 end-to-end only:
+MY_FEED_LIVE=1 uv run pytest -m network tests/test_m1_pipeline.py
 ```

@@ -1,0 +1,11 @@
+# Example config for a real-source M1 run (copy → config.local.toml).
+# Root config.toml stays offline-safe (fake only). Do not commit secrets here.
+
+top_n = 10
+default_scorer = "hybrid"
+
+enabled_sources = ["zenn", "qiita", "gigazine", "github_trending"]
+
+[scoring.hybrid]
+recency_half_life_hours = 36
+neutral_popularity_when_missing = 0.5

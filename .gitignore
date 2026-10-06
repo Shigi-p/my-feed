@@ -12,3 +12,4 @@ data/
 .DS_Store
 result.json
 out/
+config.local.toml
