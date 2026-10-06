@@ -79,9 +79,12 @@ src/my_feed/
   pipeline/
     run.py           # run_pipeline 署名 + Fake
   output/
-    base.py          # render_bundle / render_single 署名（スタブ可）
+    base.py          # MarkdownRenderer Protocol のみ
+    markdown.py      # render_bundle / render_single 実装（C0 stub → T-Md）
   store/
-    base.py          # RunStore / FavoriteStore Protocol
+    base.py          # RunStore / FavoriteStore Protocol のみ
+    memory.py        # InMemory 実装（Fake）
+    sqlite.py        # SQLite 実装（T-Store）
   cli.py
 tests/
   test_contracts_smoke.py

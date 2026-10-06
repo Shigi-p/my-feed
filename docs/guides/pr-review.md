@@ -81,6 +81,7 @@ my-feed（契約ハブ + 並行トラック）で特に効く型。
 - 各パッケージの **`base.py` は Protocol / 契約のみ**（`sources` / `scoring` と同型）
 - 実装は役割名のファイルへ置く（例: `output/markdown.py`, `store/memory.py`, `store/sqlite.py`, `sources/zenn.py`）
 - スタブを `base.py` に同居させると、後続トラックが実装をそこに足してしまいやすい
+- **本 PR で C0 側も修正済み**: `output` / `store` の実装を `markdown.py` / `memory.py` へ分離。トラック PR はこれを `main` に取り込んでからレビュー・リベースする想定
 
 ### 3.2 トラック単体完了 ≠ プロダクト完成
 
