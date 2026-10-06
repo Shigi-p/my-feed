@@ -2,10 +2,10 @@
 
 キャッチアップをいい感じにしたい
 
-## 現状（C0 + T-Md）
+## 現状
 
-契約ハブ（型・Protocol・Fake パイプライン）に加え、壁打ち用 Markdown（ルールベース）を生成できる。  
-実ソース取得・本スコア・Web・SQLite は各トラックで後続。
+並行トラックを `main` に統合済み（C0 契約ハブ + T-Src / T-Score / T-Md / T-Web / T-Store）。  
+次の合流は **M1**（実ソースでの CLI Top 10）と **M2**（Web を本番配線）。
 
 ## セットアップ（uv）
 
@@ -14,7 +14,22 @@
 uv sync --extra dev
 ```
 
-## よく使うコマンド
+## Web UI（ローカル専用）
+
+`127.0.0.1` バインド前提。認証なし・本番向けではない。
+
+```bash
+uv run my-feed serve
+# 同等:
+uv run uvicorn my_feed.web.app:app --host 127.0.0.1 --port 8000
+```
+
+開く: <http://127.0.0.1:8000/>
+
+「いま取得」→ Top 一覧 → Markdown DL → 履歴 / お気に入り。  
+pipeline / store / renderer は `my_feed.web.deps.WebDeps` 経由で注入（M2 で配線替え）。
+
+## CLI
 
 ```bash
 uv run my-feed sources
@@ -45,3 +60,4 @@ uv run pytest
 
 - [docs/plans/tech-catchup/README.md](./docs/plans/tech-catchup/README.md)
 - 届け方: [契約ハブ + 並行トラック](./docs/plans/tech-catchup/delivery-model.md)
+- レビュー観点: [docs/guides/pr-review.md](./docs/guides/pr-review.md)

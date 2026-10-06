@@ -1,0 +1,11 @@
+<form class="fetch-form" method="post" action="/runs">
+  <label>
+    スコアラー
+    <select name="scorer">
+      {% for name in scorers %}
+      <option value="{{ name }}" {% if result and result.scorer == name %}selected{% endif %}>{{ name }}</option>
+      {% endfor %}
+    </select>
+  </label>
+  <button type="submit" class="primary">いま取得</button>
+</form>

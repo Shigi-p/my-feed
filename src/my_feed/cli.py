@@ -87,5 +87,17 @@ def scorers_cmd() -> None:
         typer.echo(name)
 
 
+@app.command("serve")
+def serve_cmd(
+    host: Annotated[str, typer.Option("--host", help="Bind address")] = "127.0.0.1",
+    port: Annotated[int, typer.Option("--port", help="Port")] = 8000,
+) -> None:
+    """Start the local FastAPI UI (T-Web; Fake stores/pipeline)."""
+    import uvicorn
+
+    typer.echo(f"my feed UI → http://{host}:{port}/  (local only)")
+    uvicorn.run("my_feed.web.app:app", host=host, port=port, reload=False)
+
+
 if __name__ == "__main__":
     app()

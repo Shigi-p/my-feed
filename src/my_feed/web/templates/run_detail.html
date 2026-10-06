@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}run {{ run_id }} · my feed{% endblock %}
+{% block content %}
+<h1>run {{ run_id }}</h1>
+<p class="muted">
+  {{ result.fetched_at }} · scorer {{ result.scorer }} · status {{ result.status.value }} · {{ result.items|length }} 件
+</p>
+{% include "_fetch_form.html" %}
+<div class="toolbar">
+  <a class="btn primary" href="/runs/{{ run_id }}/markdown">Markdown DL</a>
+  <a class="btn ghost" href="/runs">履歴へ</a>
+</div>
+{% include "_item_list.html" %}
+{% endblock %}

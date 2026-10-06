@@ -1,0 +1,33 @@
+{% if not result or not result.items %}
+<p class="muted">まだ取得結果がありません。「いま取得」で Fake パイプラインを実行します。</p>
+{% else %}
+<ol class="feed">
+  {% for scored in result.items %}
+  {% set item = scored.item %}
+  <li>
+    <div class="item-main">
+      <a class="title" href="{{ item.url }}" target="_blank" rel="noopener">{{ item.title }}</a>
+      <div class="meta">
+        {{ item.source.value }} · score {{ "%.2f"|format(scored.score) }}
+      </div>
+    </div>
+    <div class="actions">
+      {% if favorite_ids.get(item.id) %}
+      <form method="post" action="/favorites/{{ favorite_ids[item.id] }}/delete">
+        <input type="hidden" name="next" value="{{ request.url.path }}">
+        <button type="submit" class="ghost">お気に入り解除</button>
+      </form>
+      {% else %}
+      <form method="post" action="/favorites">
+        <input type="hidden" name="run_id" value="{{ run_id }}">
+        <input type="hidden" name="item_id" value="{{ item.id }}">
+        <input type="hidden" name="next" value="{{ request.url.path }}">
+        <button type="submit" class="ghost">お気に入り</button>
+      </form>
+      {% endif %}
+      <a class="btn ghost" href="/runs/{{ run_id }}/items/{{ item.id }}/markdown">MD</a>
+    </div>
+  </li>
+  {% endfor %}
+</ol>
+{% endif %}

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}my feed{% endblock %}
+{% block content %}
+<h1>いまの Top {{ result.items|length if result else 10 }}</h1>
+<p class="muted">ローカル専用。C0 Fake ソース／スコアラーで取得します。</p>
+{% include "_fetch_form.html" %}
+{% if run_id and result %}
+<div class="toolbar">
+  <a class="btn primary" href="/runs/{{ run_id }}/markdown">Markdown DL</a>
+  <span class="muted">run {{ run_id }} · {{ result.fetched_at }} · {{ result.status.value }}</span>
+</div>
+{% endif %}
+{% include "_item_list.html" %}
+{% endblock %}

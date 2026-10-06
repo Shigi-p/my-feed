@@ -29,7 +29,8 @@ class InMemoryFavoriteStore:
     """C0 / T-Web Fake store.
 
     Keeps both favorite_id → Item and item.id → favorite_id so UI can resolve
-    delete targets without calling ``add`` on every page render.
+    delete targets without calling ``add`` on every page render (important once
+    SQLite is wired at M2).
     """
 
     def __init__(self) -> None:
