@@ -50,8 +50,8 @@ def create_app(deps: WebDeps | None = None) -> FastAPI:
         return mapping
 
     def _scorer_choices() -> list[str]:
-        # ``fake`` stays listed while C0 demos need it. After M1, product may
-        # hide fake from the dropdown while keeping it registered for tests.
+        # Keep ``fake`` visible on purpose: when multiple scorers exist, comparing
+        # fake vs hybrid (and reading score_breakdown) is useful for debugging.
         return deps.list_scorers_fn()
 
     @app.get("/", response_class=HTMLResponse)
