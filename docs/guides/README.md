@@ -4,4 +4,5 @@
 
 | ファイル | 内容 |
 |----------|------|
+| [collaboration.md](./collaboration.md) | 協働・方針メモ（エージェント向け・草案） |
 | [pr-review.md](./pr-review.md) | PR レビュー観点（草案） |
