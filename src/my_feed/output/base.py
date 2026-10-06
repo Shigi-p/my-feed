@@ -1,8 +1,7 @@
 """Markdown renderer contracts (Protocol only).
 
-Implementations live in ``output.markdown`` (C0 stub now; T-Md replaces body).
-Keep this module free of rendering logic so ``base`` means “interface”,
-matching ``sources`` / ``scoring``.
+Implementations live in ``output.markdown``. Keep this module free of
+rendering logic so ``base`` means “interface”, matching sources/scoring.
 """
 
 from __future__ import annotations

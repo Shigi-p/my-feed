@@ -25,7 +25,9 @@ def run_cmd(
     config_path: Annotated[Path, typer.Option("--config", help="Path to config.toml")] = Path("config.toml"),
     as_json: Annotated[bool, typer.Option("--json", help="Print JSON")] = False,
     out: Annotated[Optional[Path], typer.Option("--out", help="Write JSON to file")] = None,
-    out_md: Annotated[Optional[Path], typer.Option("--out-md", help="Write stub markdown")] = None,
+    out_md: Annotated[
+        Optional[Path], typer.Option("--out-md", help="Write Gemini-ready markdown")
+    ] = None,
 ) -> None:
     """Fetch → score → top N (Fake sources/scorer in C0)."""
     config = load_config(config_path)
@@ -62,7 +64,7 @@ def run_cmd(
             generated_at=result.fetched_at,
             scorer=result.scorer,
             count=len(result.items),
-            intro="C0 stub markdown — replace with T-Md templates later.",
+            intro=None,
         )
         out_md.write_text(render_bundle(result.items, meta), encoding="utf-8")
         typer.echo(f"wrote {out_md}")
