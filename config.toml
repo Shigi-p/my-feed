@@ -1,7 +1,12 @@
-# my-feed local config (C0 minimal shape)
+# my-feed local config (C0 minimal shape + T-Score knobs)
 
 top_n = 10
 default_scorer = "fake"
 
 # Sources enabled for the pipeline. C0 ships only the fake adapter.
 enabled_sources = ["fake"]
+
+# Scoring parameters (hybrid is the default-candidate strategy for M1).
+[scoring.hybrid]
+recency_half_life_hours = 36
+neutral_popularity_when_missing = 0.5
