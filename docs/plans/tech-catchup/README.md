@@ -26,6 +26,7 @@
 | [contracts/](./contracts/README.md) | C0 契約ハブ詳細 |
 | [tracks/](./tracks/README.md) | T-Src / T-Score / T-Md / T-Web / T-Store |
 | [milestones/](./milestones/README.md) | M1〜M4 合流点 |
+| [../../guides/pr-review.md](../../guides/pr-review.md) | PR レビュー観点（草案） |
 
 ## 現在の位置
 
