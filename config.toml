@@ -12,3 +12,13 @@ enabled_sources = ["fake"]
 [scoring.hybrid]
 recency_half_life_hours = 36
 neutral_popularity_when_missing = 0.5
+
+# AI Summarization (M4-D). Disabled by default for offline-safe runs.
+# Set GEMINI_API_KEY env var and enabled = true to use.
+[summarizer]
+enabled = false
+provider = "gemini"
+model = "gemini-3.5-flash"
+api_key_env = "GEMINI_API_KEY"
+temperature = 0.3
+max_output_tokens = 200

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 import tomllib
 from pathlib import Path
 
@@ -26,11 +27,27 @@ class ScoringConfig(BaseModel):
     hybrid: HybridScoringConfig = Field(default_factory=HybridScoringConfig)
 
 
+class SummarizerConfig(BaseModel):
+    """AI summarization settings (M4-D)."""
+
+    enabled: bool = True
+    provider: str = "gemini"
+    model: str = "gemini-3.5-flash"
+    api_key_env: str = "GEMINI_API_KEY"
+    temperature: float = 0.3
+    max_output_tokens: int = 200
+
+    def get_api_key(self) -> str | None:
+        """Read API key from environment variable."""
+        return os.getenv(self.api_key_env)
+
+
 class AppConfig(BaseModel):
     top_n: int = 10
     default_scorer: str = "fake"
     enabled_sources: list[SourceName] = Field(default_factory=lambda: [SourceName.FAKE])
     scoring: ScoringConfig = Field(default_factory=ScoringConfig)
+    summarizer: SummarizerConfig = Field(default_factory=SummarizerConfig)
 
 
 def resolve_config_path(base_dir: Path | None = None) -> Path:

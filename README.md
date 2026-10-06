@@ -17,7 +17,8 @@ uv sync --extra dev
 ## いちばん短い使い方（ローカル完成）
 
 ```bash
-cp config.example.toml config.local.toml   # 初回のみ（実ソース + hybrid）
+cp config.example.toml config.local.toml   # 初回のみ（実ソース + hybrid + AI要約）
+export GEMINI_API_KEY="your-api-key-here"  # AI要約を使う場合
 uv run my-feed serve
 ```
 
@@ -26,6 +27,25 @@ uv run my-feed serve
 - `config.local.toml` があれば Web / `load_config()` はそれを優先（無ければ `config.toml`）
 - 履歴・お気に入りは `data/my_feed.db`（再起動後も残る）
 - 認証なし・`127.0.0.1` 前提。本番公開しない
+
+### AI要約機能（M4-D）
+
+Gemini 3.5 Flash を使った記事要約が利用可能です：
+
+1. **APIキーの取得**: [Google AI Studio](https://aistudio.google.com/apikey) で無料取得
+2. **環境変数の設定**:
+   ```bash
+   export GEMINI_API_KEY="your-api-key-here"
+   ```
+   または `.env` ファイルを作成（`.gitignore` 済み）:
+   ```
+   GEMINI_API_KEY=your-api-key-here
+   ```
+3. **設定ファイル**: `config.local.toml` で `[summarizer] enabled = true`（example の初期値）
+
+**コスト**: 1記事あたり約0.05円、10記事で約0.5円（無料枠でも実用的）
+
+APIキー未設定時は警告のみで要約をスキップします。
 
 オプション:
 
@@ -74,8 +94,10 @@ uv run pytest
 
 ## Markdown → Gemini 壁打ち
 
-CLI の `--out-md` または Web の Markdown DL で bundle（抜粋・なぜ今見るか・問い）を出す。  
-Gemini / ChatGPT に貼り、「気になる番号で要約 → 反論 → 最小実験」と依頼する。LLM API は使わない。
+CLI の `--out-md` または Web の Markdown DL で bundle（AI要約・抜粋・なぜ今見るか・問い）を出す。  
+Gemini / ChatGPT に貼り、「気になる番号で要約 → 反論 → 最小実験」と依頼する。
+
+M4-D 以降は AI 要約が自動生成されるため、手動での要約依頼は不要になります。
 
 ## 契約変更の手順
 
