@@ -3,5 +3,7 @@
 top_n = 10
 default_scorer = "fake"
 
-# Sources enabled for the pipeline. C0 ships only the fake adapter.
+# Sources enabled for the pipeline. Default stays offline-safe with fake.
+# Real adapters (zenn, qiita, gigazine, github_trending) are registered;
+# see docs/notes/sources.md for endpoints and an example enabling them.
 enabled_sources = ["fake"]

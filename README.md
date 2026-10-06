@@ -25,7 +25,8 @@ uv run my-feed run --out-md /tmp/feed.md
 uv run pytest
 ```
 
-`config.toml` の `enabled_sources` / `default_scorer` / `top_n` を変更できる。C0 では `fake` のみ登録。
+`config.toml` の `enabled_sources` / `default_scorer` / `top_n` を変更できる。  
+デフォルトはオフライン安全のため `fake` のみ。実ソース（Zenn / Qiita / GIGAZINE / GitHub Trending）はレジストリ登録済み — 有効化例は [docs/notes/sources.md](./docs/notes/sources.md)。
 
 ## 契約変更の手順
 

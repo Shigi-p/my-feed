@@ -5,9 +5,17 @@ from __future__ import annotations
 from my_feed.models import SourceName
 from my_feed.sources.base import SourceAdapter
 from my_feed.sources.fake import FakeSourceAdapter
+from my_feed.sources.gigazine import GigazineSourceAdapter
+from my_feed.sources.github_trending import GitHubTrendingSourceAdapter
+from my_feed.sources.qiita import QiitaSourceAdapter
+from my_feed.sources.zenn import ZennSourceAdapter
 
 _REGISTRY: dict[SourceName, SourceAdapter] = {
     SourceName.FAKE: FakeSourceAdapter(),
+    SourceName.ZENN: ZennSourceAdapter(),
+    SourceName.QIITA: QiitaSourceAdapter(),
+    SourceName.GIGAZINE: GigazineSourceAdapter(),
+    SourceName.GITHUB_TRENDING: GitHubTrendingSourceAdapter(),
 }
 
 

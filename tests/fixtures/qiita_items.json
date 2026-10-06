@@ -1,0 +1,65 @@
+[
+  {
+    "id": "7505a402e3fb78209796",
+    "title": "【海外テック動向】誤差逆伝播なしの学習モデルからexample.com刷新まで注目の3選",
+    "url": "https://qiita.com/tanakanekosuke/items/7505a402e3fb78209796",
+    "created_at": "2026-10-06T11:12:03+09:00",
+    "likes_count": 0,
+    "stocks_count": 0,
+    "tags": [
+      {
+        "name": "Python",
+        "versions": []
+      },
+      {
+        "name": "GitHub",
+        "versions": []
+      },
+      {
+        "name": "AI",
+        "versions": []
+      },
+      {
+        "name": "Trend",
+        "versions": []
+      }
+    ],
+    "body": "# 【海外テック動向】誤差逆伝播なしの学習モデルからexample.com刷新まで注目の3選\n\n海外のエンジニアコミュニティで今まさに話題となっている、注目の新技術や検証レポートをピックアップしてご紹介します。\n\n今回は「誤差逆伝播に頼らない新しいTransformerの学習法」「AIチューターの実証実験データ」「あのWebの象徴『example.com』のリデザイン」という、基盤技術から日常のW"
+  },
+  {
+    "id": "04c4208c173fd7bb909a",
+    "title": "個人情報を扱うサービスのリスクは高まっている",
+    "url": "https://qiita.com/uni928/items/04c4208c173fd7bb909a",
+    "created_at": "2026-10-06T11:08:28+09:00",
+    "likes_count": 0,
+    "stocks_count": 0,
+    "tags": [
+      {
+        "name": "Security",
+        "versions": []
+      },
+      {
+        "name": "サービス開発",
+        "versions": []
+      },
+      {
+        "name": "リスク管理",
+        "versions": []
+      },
+      {
+        "name": "AI活用",
+        "versions": []
+      },
+      {
+        "name": "データべース設計",
+        "versions": []
+      }
+    ],
+    "body": "個人情報の流出は、ニュースで目にする機会が多くなりました。\n\nけれど、**報道で知っていること**と、**自分の事業に関わるリスクとして考えること**は別です。\n\n> 漏えいが起きたら、利用者への影響だけでなく、サービスの信用や運営にも響く可能性があります。\n\n個人情報を扱うサービスを運営するなら、対策だけでなく、**そもそも、その情報を集める必要があるか**を見直すことも大切です。\n\n保存する情"
+  },
+  {
+    "id": "bad",
+    "title": "",
+    "url": ""
+  }
+]
