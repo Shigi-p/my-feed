@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}my feed{% endblock %}</title>
+  <style>
+    :root {
+      --bg: #f6f3ee;
+      --ink: #1c1a17;
+      --muted: #5c574f;
+      --line: #d8d0c4;
+      --accent: #0b6e4f;
+      --accent-ink: #f4fff9;
+      --surface: #fffdf9;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "IBM Plex Sans", "Hiragino Sans", "Noto Sans JP", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(ellipse 80% 50% at 10% -10%, #e7efe8 0%, transparent 55%),
+        linear-gradient(180deg, #efeae2 0%, var(--bg) 40%, #ebe4d8 100%);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+    a { color: var(--accent); }
+    .wrap {
+      max-width: 52rem;
+      margin: 0 auto;
+      padding: 1.25rem 1.25rem 3rem;
+    }
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 0.75rem 1.5rem;
+      margin-bottom: 1.75rem;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 0.85rem;
+    }
+    .brand {
+      font-family: "IBM Plex Serif", "Source Serif 4", "Hiragino Mincho ProN", serif;
+      font-size: 1.75rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      text-decoration: none;
+      color: var(--ink);
+    }
+    nav { display: flex; gap: 1rem; font-size: 0.95rem; }
+    nav a { text-decoration: none; color: var(--muted); }
+    nav a[aria-current="page"] { color: var(--ink); font-weight: 600; }
+    h1, h2 {
+      font-family: "IBM Plex Serif", "Source Serif 4", "Hiragino Mincho ProN", serif;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+    h1 { font-size: 1.35rem; margin: 0 0 0.75rem; }
+    h2 { font-size: 1.1rem; margin: 1.5rem 0 0.5rem; }
+    .muted { color: var(--muted); font-size: 0.9rem; }
+    .fetch-form {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      align-items: end;
+      margin: 1rem 0 1.5rem;
+      padding: 0.85rem 0;
+      border-bottom: 1px solid var(--line);
+    }
+    label { display: grid; gap: 0.25rem; font-size: 0.85rem; color: var(--muted); }
+    select, button, .btn {
+      font: inherit;
+      padding: 0.45rem 0.85rem;
+      border: 1px solid var(--line);
+      background: var(--surface);
+      color: var(--ink);
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button.primary, .btn.primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--accent-ink);
+    }
+    button.ghost, .btn.ghost {
+      background: transparent;
+    }
+    ol.feed, ul.plain {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    ol.feed { counter-reset: rank; }
+    ol.feed > li {
+      display: grid;
+      grid-template-columns: 2rem 1fr auto;
+      gap: 0.5rem 0.75rem;
+      padding: 0.85rem 0;
+      border-bottom: 1px solid var(--line);
+      align-items: start;
+    }
+    ol.feed > li::before {
+      counter-increment: rank;
+      content: counter(rank);
+      font-variant-numeric: tabular-nums;
+      color: var(--muted);
+      padding-top: 0.15rem;
+    }
+    .item-main { min-width: 0; }
+    .item-main a.title {
+      color: var(--ink);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .item-main a.title:hover { text-decoration: underline; }
+    .meta {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-top: 0.2rem;
+    }
+    .actions {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      align-items: stretch;
+    }
+    .actions form { margin: 0; }
+    .actions button, .actions .btn {
+      font-size: 0.8rem;
+      white-space: nowrap;
+      text-align: center;
+      text-decoration: none;
+    }
+    table.history {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+    }
+    table.history th, table.history td {
+      text-align: left;
+      padding: 0.55rem 0.35rem;
+      border-bottom: 1px solid var(--line);
+    }
+    table.history th { color: var(--muted); font-weight: 500; font-size: 0.85rem; }
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin: 0.75rem 0 1rem;
+    }
+    @media (max-width: 560px) {
+      ol.feed > li {
+        grid-template-columns: 1.5rem 1fr;
+      }
+      .actions {
+        grid-column: 2;
+        flex-direction: row;
+        flex-wrap: wrap;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <a class="brand" href="/">my feed</a>
+      <nav>
+        <a href="/" {% if nav == "home" %}aria-current="page"{% endif %}>いま</a>
+        <a href="/runs" {% if nav == "runs" %}aria-current="page"{% endif %}>履歴</a>
+        <a href="/favorites" {% if nav == "favorites" %}aria-current="page"{% endif %}>お気に入り</a>
+      </nav>
+    </header>
+    {% block content %}{% endblock %}
+  </div>
+</body>
+</html>

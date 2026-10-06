@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}履歴 · my feed{% endblock %}
+{% block content %}
+<h1>履歴</h1>
+<p class="muted">メモリ上の RunStore（プロセス再起動で消えます）。</p>
+{% if not runs %}
+<p class="muted">まだ実行がありません。</p>
+{% else %}
+<table class="history">
+  <thead>
+    <tr>
+      <th>run</th>
+      <th>取得時刻</th>
+      <th>scorer</th>
+      <th>件数</th>
+      <th>status</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for run in runs %}
+    <tr>
+      <td><a href="/runs/{{ run.id }}">{{ run.id }}</a></td>
+      <td>{{ run.fetched_at }}</td>
+      <td>{{ run.scorer }}</td>
+      <td>{{ run.count }}</td>
+      <td>{{ run.status }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+{% endblock %}
