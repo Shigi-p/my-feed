@@ -24,6 +24,7 @@
 - [ ] 認証・Drive・AI 要約を後回しでよい
 - [ ] GIGAZINE 当面無フィルタでよい
 - [ ] スタック仮決め（Python + uv + FastAPI + SQLite）でよい
+- [ ] 開発環境は当面 uv、必要になったら Docker（中でも uv）でよい
 
 ---
 

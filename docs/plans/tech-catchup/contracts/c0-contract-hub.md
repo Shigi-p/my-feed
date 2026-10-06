@@ -44,13 +44,17 @@
 | 項目 | 仮決め |
 |------|--------|
 | 言語 | Python 3.12+ |
-| パッケージ管理 | **uv**（`pyproject.toml`） |
+| パッケージ管理 | **uv**（`pyproject.toml` + 可能なら `uv.lock`） |
+| 開発環境 | **当面はホスト上の uv**。Docker は C0 では作らない |
+| コンテナ | 必要になったら追加（イメージ内でも uv を使う想定）。M4 や環境差分が痛くなったタイミング |
 | モデル | pydantic v2 |
 | HTTP（後続用） | `httpx`（C0 では未使用でも依存に含めてよい） |
 | RSS（後続用） | `feedparser` |
 | CLI 枠 | `typer`（`run` は Fake で動かす） |
 | 設定 | `config.toml` |
 | テスト | pytest |
+
+理由の要約: 短期はフィードバック速度と worktree 並行を優先。Python 依存の再現は `uv.lock` でまず担保し、OS/実行環境まで固定したくなったら Docker を後付けする。
 
 ---
 

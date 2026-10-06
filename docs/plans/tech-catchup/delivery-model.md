@@ -117,3 +117,9 @@ T-Web は FakeSource / FakeScorer / メモリ Store で進めてよい。
 ```
 
 実験の肝: **C0 完了時点で T-Web を開始してよい**。
+
+## 6. 開発環境（追記）
+
+- **当面: ホスト上の uv**（`pyproject.toml` / `uv.lock`）
+- **必要になったら Docker** を追加する（二者択一ではない。コンテナ内でも uv）
+- C0〜M2 では Docker 必須にしない。検討タイミングは環境差分の実害または M4
