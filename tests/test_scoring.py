@@ -56,6 +56,11 @@ def test_extract_popularity_prefers_likes_then_stars():
     assert extract_popularity({}) is None
 
 
+def test_extract_popularity_prefers_stars_today_over_stars():
+    assert extract_popularity({"stars_today": 12, "stars": 9999}) == 12.0
+    assert extract_popularity({"stars_today": 3}) == 3.0
+
+
 def test_normalize_minmax_maps_within_cohort():
     assert normalize_values([10.0, 20.0, 30.0], method="minmax") == pytest.approx(
         [0.0, 0.5, 1.0]

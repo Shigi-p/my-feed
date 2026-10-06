@@ -11,10 +11,15 @@ NormalizeMethod = Literal["minmax", "rank"]
 
 # Preferred metric keys in priority order (sources expose different names).
 # First hit wins — e.g. an item with both likes and stocks uses likes only.
-# Note: GitHub adapters may also expose ``stars_today``; it is intentionally
-# NOT in this list today (all-time ``stars`` wins). Promote stars_today only
-# after an explicit product decision.
-POPULARITY_METRIC_KEYS: tuple[str, ...] = ("likes", "stocks", "stars", "forks")
+# GitHub Trending: prefer ``stars_today`` over all-time ``stars`` so daily runs
+# surface fresh movers instead of the same perennial high-star repos.
+POPULARITY_METRIC_KEYS: tuple[str, ...] = (
+    "likes",
+    "stocks",
+    "stars_today",
+    "stars",
+    "forks",
+)
 
 DEFAULT_NEUTRAL = 0.5
 
