@@ -29,6 +29,9 @@ packages = ["src/my_feed"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]
+markers = [
+    "network: hits live upstream APIs (opt-in via MY_FEED_LIVE=1)",
+]
 
 [tool.uv]
 package = true

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0"
+    xmlns:dc="http://purl.org/dc/elements/1.1/"
+    xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+    xmlns:admin="http://webns.net/mvcb/"
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:content="http://purl.org/rss/1.0/modules/content/"
+    xmlns:atom="http://www.w3.org/2005/Atom">
+
+    <channel>
+    <atom:link href="http://gigazine.net/news/rss_2.0/" rel="self" type="application/rss+xml" />
+    <title>GIGAZINE</title>
+    <link>https://gigazine.net/</link>
+    <description>日々のあらゆる雑談に役立つネタを提供するIT系ニュースサイト。起きている限りほぼ毎日更新中。</description>
+    <dc:language>ja-JP</dc:language>
+    
+    <dc:rights>Copyright 2026</dc:rights>
+    <dc:date>2026-10-06T10:54:00+09:00</dc:date>
+    <admin:generatorAgent rdf:resource="http://www.pmachine.com/" />
+    
+
+    <item>
+      <title>OpenAIがChatGPTのテキストに透かしを入れる取り組みを開始</title>
+      <link>https://gigazine.net/news/20261006&#45;openai&#45;start&#45;watermarking&#45;chatgpt&#45;text&#45;eu/</link>
+      <guid isPermaLink="true">https://gigazine.net/news/20261006-openai-start-watermarking-chatgpt-text-eu/</guid>
+      <description><![CDATA[大手AI企業のOpenAIが、EUのAI法を順守するためにChatGPTやCodexによって生成されたテキストに、目に見えない透かしを追加すると発表しました。<p><b><a href="https://gigazine.net/news/20261006&#45;openai&#45;start&#45;watermarking&#45;chatgpt&#45;text&#45;eu/">続きを読む...</a></b></p>]]></description>
+      <pubDate>Tue, 06 Oct 2026 10:54:00 +0900</pubDate>
+      <dc:subject>AI,</dc:subject>
+      <dc:date>2026-10-06T10:54:00+09:00</dc:date>
+    </item><item>
+      <title>光を使って特定の神経細胞の活動を操作する「光遺伝学」を切り開いた3人の研究者がノーベル医学・生理学賞を受賞</title>
+      <link>https://gigazine.net/news/20261006&#45;nobel&#45;prize&#45;physiology&#45;or&#45;medicine&#45;2026/</link>
+      <guid isPermaLink="true">https://gigazine.net/news/20261006-nobel-prize-physiology-or-medicine-2026/</guid>
+      <description><![CDATA[スウェーデン・カロリンスカ研究所のノーベル委員会は、アメリカのハワード・ヒューズ医学研究所研究員でスタンフォード大学D.H.チェン教授のカール・ダイセロス氏、ドイツのベルリン・フンボルト大学神経科学ハーティ上級教授のペーター・ヘーゲマン氏、ドイツのヴュルツブルク大学分子植物生理学教授のゲオルク・ナーゲル氏に2026年ノーベル生理学・医学賞を授与すると発表しました。受賞理由は「光で開閉するイオンチャネルと光遺伝学に関する発見」で、3人には賞金1200万スウェーデンクローナ(約1億8900万円)が均等に分配されます。<p><b><a href="https://gigazine.net/news/20261006&#45;nobel&#45;prize&#45;physiology&#45;or&#45;medicine&#45;2026/">続きを読む...</a></b></p>]]></description>
+      <pubDate>Tue, 06 Oct 2026 10:39:00 +0900</pubDate>
+      <dc:subject>サイエンス,</dc:subject>
+      <dc:date>2026-10-06T10:39:00+09:00</dc:date>
+    </item>
+    <item>
+      <title></title>
+      <link></link>
+      <guid></guid>
+      <description></description>
+    </item>
+
+  </channel>
+</rss>

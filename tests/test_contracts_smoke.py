@@ -46,6 +46,19 @@ def test_fake_adapters_are_protocols():
     assert "fake" in list_scorers()
 
 
+def test_real_sources_are_registered():
+    for name in (
+        SourceName.ZENN,
+        SourceName.QIITA,
+        SourceName.GIGAZINE,
+        SourceName.GITHUB_TRENDING,
+    ):
+        adapter = get_source(name)
+        assert isinstance(adapter, SourceAdapter)
+        assert adapter.name == name
+        assert name in list_sources()
+
+
 def test_run_pipeline_returns_top_n():
     result = run_pipeline(
         AppConfig(top_n=10, default_scorer="fake", enabled_sources=[SourceName.FAKE])
