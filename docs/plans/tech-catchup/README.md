@@ -31,5 +31,5 @@
 
 ## 現在の位置
 
-**M1 完了**（CLI で実ソース Top 10）。次は **M2（ローカル完成）** — Web の本番配線と SQLite。  
-トラック（T-Src / T-Score / T-Md / T-Web / T-Store）と C0 は `main` 合流済み。
+**M2 完了**（localhost で実取得〜 Markdown DL〜履歴・お気に入り）。次は任意の **M3（運用改善）**。  
+M1（CLI Top 10）および各トラック・C0 は `main` 合流済み。

@@ -91,12 +91,26 @@ def scorers_cmd() -> None:
 def serve_cmd(
     host: Annotated[str, typer.Option("--host", help="Bind address")] = "127.0.0.1",
     port: Annotated[int, typer.Option("--port", help="Port")] = 8000,
+    config_path: Annotated[
+        Path | None,
+        typer.Option("--config", help="Config path (default: config.local.toml if present)"),
+    ] = None,
+    db_path: Annotated[
+        Path | None,
+        typer.Option("--db", help="SQLite path (default: data/my_feed.db)"),
+    ] = None,
 ) -> None:
-    """Start the local FastAPI UI (T-Web; Fake stores/pipeline)."""
+    """Start the local FastAPI UI (SQLite history; sources from config)."""
     import uvicorn
 
+    from my_feed.web.app import create_app
+    from my_feed.web.deps import create_default_web_deps
+
+    deps = create_default_web_deps(config_path=config_path, db_path=db_path)
+    app = create_app(deps)
     typer.echo(f"my feed UI → http://{host}:{port}/  (local only)")
-    uvicorn.run("my_feed.web.app:app", host=host, port=port, reload=False)
+    typer.echo(f"config={deps.config_path}  db={deps.db_path}")
+    uvicorn.run(app, host=host, port=port, reload=False)
 
 
 if __name__ == "__main__":

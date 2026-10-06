@@ -9,8 +9,8 @@ from fastapi import FastAPI, Form, HTTPException, Request
 from fastapi.responses import HTMLResponse, RedirectResponse, Response
 from fastapi.templating import Jinja2Templates
 
-from my_feed.models import RenderMeta
-from my_feed.web.deps import WebDeps
+from my_feed.models import RenderMeta, SourceName
+from my_feed.web.deps import WebDeps, create_default_web_deps
 
 TEMPLATES_DIR = Path(__file__).resolve().parent / "templates"
 
@@ -26,11 +26,11 @@ def _safe_next_url(next_url: str, *, default: str = "/") -> str:
 def create_app(deps: WebDeps | None = None) -> FastAPI:
     """Build the app with injectable stores / pipeline / renderer.
 
-    Fetch runs synchronously inside the request (acceptable for Fake / local).
-    Real adapters at M2 may block for seconds — add timeouts, disable double
-    submit, or background jobs if that becomes painful.
+    Fetch runs synchronously inside the request (acceptable for local use).
+    Real adapters may block for seconds — disable double-submit or move to a
+    background job later if that becomes painful.
     """
-    deps = deps or WebDeps()
+    deps = deps or create_default_web_deps()
     templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
     app = FastAPI(title="my feed", docs_url=None, redoc_url=None)
     app.state.deps = deps
@@ -50,28 +50,36 @@ def create_app(deps: WebDeps | None = None) -> FastAPI:
         return mapping
 
     def _scorer_choices() -> list[str]:
-        # Keep ``fake`` visible on purpose: when multiple scorers exist, comparing
-        # fake vs hybrid (and reading score_breakdown) is useful for debugging.
+        # Keep ``fake`` visible on purpose: comparing fake vs hybrid (and reading
+        # score_breakdown) remains useful for debugging.
         return deps.list_scorers_fn()
+
+    def _page_config():
+        return deps.load_config_fn(deps.config_path)
+
+    def _run_context(run_id: str | None, result) -> dict:
+        config = _page_config()
+        return {
+            "scorers": _scorer_choices(),
+            "default_scorer": config.default_scorer,
+            "enabled_sources": [s.value for s in config.enabled_sources],
+            "using_fake_only": config.enabled_sources == [SourceName.FAKE],
+            "config_path": str(deps.config_path),
+            "run_id": run_id,
+            "result": result,
+            "favorite_ids": _favorite_ids(),
+        }
 
     @app.get("/", response_class=HTMLResponse)
     async def index(request: Request) -> HTMLResponse:
         run_id = _latest_run_id()
         result = deps.run_store.get_run(run_id) if run_id else None
-        return templates.TemplateResponse(
-            request,
-            "index.html",
-            {
-                "scorers": _scorer_choices(),
-                "run_id": run_id,
-                "result": result,
-                "favorite_ids": _favorite_ids(),
-                "nav": "home",
-            },
-        )
+        ctx = _run_context(run_id, result)
+        ctx["nav"] = "home"
+        return templates.TemplateResponse(request, "index.html", ctx)
 
     @app.post("/runs")
-    async def create_run(scorer: str = Form("fake")) -> RedirectResponse:
+    async def create_run(scorer: str = Form("hybrid")) -> RedirectResponse:
         # Blocks until pipeline returns (see create_app docstring).
         config = deps.load_config_fn(deps.config_path)
         config = config.model_copy(update={"default_scorer": scorer})
@@ -107,17 +115,9 @@ def create_app(deps: WebDeps | None = None) -> FastAPI:
         result = deps.run_store.get_run(run_id)
         if result is None:
             raise HTTPException(status_code=404, detail="run not found")
-        return templates.TemplateResponse(
-            request,
-            "run_detail.html",
-            {
-                "run_id": run_id,
-                "result": result,
-                "favorite_ids": _favorite_ids(),
-                "scorers": _scorer_choices(),
-                "nav": "runs",
-            },
-        )
+        ctx = _run_context(run_id, result)
+        ctx["nav"] = "runs"
+        return templates.TemplateResponse(request, "run_detail.html", ctx)
 
     @app.get("/runs/{run_id}/markdown")
     async def download_bundle(run_id: str) -> Response:
@@ -128,7 +128,7 @@ def create_app(deps: WebDeps | None = None) -> FastAPI:
             generated_at=result.fetched_at,
             scorer=result.scorer,
             count=len(result.items),
-            intro="T-Web stub markdown — swap renderer at M2 (T-Md).",
+            intro=None,
         )
         body = deps.render_bundle_fn(result.items, meta)
         filename = f"my-feed-{run_id}.md"
@@ -152,7 +152,7 @@ def create_app(deps: WebDeps | None = None) -> FastAPI:
             generated_at=result.fetched_at,
             scorer=result.scorer,
             count=1,
-            intro="T-Web stub markdown — swap renderer at M2 (T-Md).",
+            intro=None,
         )
         body = deps.render_single_fn(scored, meta)
         safe = quote(item_id, safe="")
@@ -213,5 +213,15 @@ def create_app(deps: WebDeps | None = None) -> FastAPI:
     return app
 
 
-# Default ASGI app for ``uvicorn my_feed.web.app:app``
-app = create_app()
+# Lazily built so ``from my_feed.web.app import create_app`` (tests) does not
+# open SQLite. ``uvicorn my_feed.web.app:app`` still works.
+_app: FastAPI | None = None
+
+
+def __getattr__(name: str) -> FastAPI:
+    global _app
+    if name == "app":
+        if _app is None:
+            _app = create_app()
+        return _app
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

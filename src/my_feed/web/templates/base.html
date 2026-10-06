@@ -150,6 +150,17 @@
       gap: 0.5rem;
       margin: 0.75rem 0 1rem;
     }
+    ul.source-errors {
+      margin: 0 0 1rem;
+      padding: 0.65rem 0.85rem;
+      list-style: none;
+      border: 1px solid var(--line);
+      background: var(--surface);
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+    ul.source-errors li + li { margin-top: 0.35rem; }
+    ul.source-errors strong { color: var(--ink); }
     @media (max-width: 560px) {
       ol.feed > li {
         grid-template-columns: 1.5rem 1fr;

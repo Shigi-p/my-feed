@@ -1,4 +1,4 @@
-"""Local FastAPI UI (T-Web). Swap pipeline/store/renderer at M2 via create_app deps."""
+"""Local FastAPI UI. Defaults (M2): SQLite stores + resolved config via create_app()."""
 
 from my_feed.web.app import create_app
 

@@ -10,6 +10,7 @@ from pydantic import BaseModel, Field
 from my_feed.models import SourceName
 
 DEFAULT_CONFIG_PATH = Path("config.toml")
+LOCAL_CONFIG_PATH = Path("config.local.toml")
 
 
 class HybridScoringConfig(BaseModel):
@@ -32,8 +33,21 @@ class AppConfig(BaseModel):
     scoring: ScoringConfig = Field(default_factory=ScoringConfig)
 
 
+def resolve_config_path(base_dir: Path | None = None) -> Path:
+    """Prefer ``config.local.toml`` when present; otherwise ``config.toml``.
+
+    Keeps the repo root offline-safe while letting M1/M2 real-source runs use a
+    local override without editing the committed default.
+    """
+    root = base_dir if base_dir is not None else Path.cwd()
+    local = root / LOCAL_CONFIG_PATH.name
+    if local.is_file():
+        return local
+    return root / DEFAULT_CONFIG_PATH.name
+
+
 def load_config(path: Path | None = None) -> AppConfig:
-    config_path = path or DEFAULT_CONFIG_PATH
+    config_path = path if path is not None else resolve_config_path()
     if not config_path.exists():
         return AppConfig()
     with config_path.open("rb") as fh:
