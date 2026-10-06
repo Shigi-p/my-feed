@@ -107,6 +107,8 @@ def test_favorite_upsert_by_item_id_and_persist(db_path: Path) -> None:
     )
     fav_id = store.add(item)
     assert store.add(item) == fav_id  # upsert keeps same favorite id
+    assert store.favorite_id_for(item.id) == fav_id
+    assert store.favorite_id_for("missing") is None
 
     updated = item.model_copy(update={"title": "updated"})
     assert store.add(updated) == fav_id
@@ -117,12 +119,30 @@ def test_favorite_upsert_by_item_id_and_persist(db_path: Path) -> None:
     # Persist across reconnect.
     store2 = create_sqlite_favorite_store(db_path)
     assert store2.list()[0].title == "updated"
+    assert store2.favorite_id_for(item.id) == fav_id
     store2.remove(fav_id)
     assert store2.list() == []
+    assert store2.favorite_id_for(item.id) is None
 
     # remove is idempotent for unknown ids
     store2.remove("no-such-id")
     assert store2.list() == []
+
+
+def test_inmemory_favorite_id_for_is_read_only():
+    favs = InMemoryFavoriteStore()
+    now = datetime.now(UTC)
+    item = Item(
+        id="fake:9",
+        source=SourceName.FAKE,
+        title="t",
+        url="https://example.com/9",
+        fetched_at=now,
+    )
+    assert favs.favorite_id_for(item.id) is None
+    fav_id = favs.add(item)
+    assert favs.favorite_id_for(item.id) == fav_id
+    assert favs.list() == [item]
 
 
 def test_open_sqlite_stores_share_db(db_path: Path, sample_result) -> None:
