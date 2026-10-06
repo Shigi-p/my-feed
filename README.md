@@ -2,10 +2,10 @@
 
 キャッチアップをいい感じにしたい
 
-## 現状（C0）
+## 現状（C0 + T-Md）
 
-契約ハブ（型・Protocol・Fake パイプライン）を実装中。  
-実ソース取得・本スコア・本 Markdown・Web・SQLite は各トラックで後続。
+契約ハブ（型・Protocol・Fake パイプライン）に加え、壁打ち用 Markdown（ルールベース）を生成できる。  
+実ソース取得・本スコア・Web・SQLite は各トラックで後続。
 
 ## セットアップ（uv）
 
@@ -27,6 +27,11 @@ uv run pytest
 
 `config.toml` の `enabled_sources` / `default_scorer` / `top_n` を変更できる。  
 デフォルトはオフライン安全のため `fake` のみ。実ソース（Zenn / Qiita / GIGAZINE / GitHub Trending）はレジストリ登録済み — 有効化例は [docs/notes/sources.md](./docs/notes/sources.md)。
+
+## Markdown → Gemini 壁打ち
+
+`--out-md` で Top N の bundle（抜粋・なぜ今見るか・問い 2〜3）を書き出す。  
+ファイル内容を Gemini / ChatGPT に貼り、「気になる番号で要約 → 反論 → 最小実験」と依頼する。LLM API は使わない。
 
 ## 契約変更の手順
 

@@ -70,7 +70,7 @@ def test_run_pipeline_returns_top_n():
     assert scores == sorted(scores, reverse=True)
 
 
-def test_render_stub_and_memory_stores():
+def test_render_and_memory_stores():
     result = run_pipeline(AppConfig(top_n=3, enabled_sources=[SourceName.FAKE]))
     meta = RenderMeta(
         generated_at=result.fetched_at,
@@ -79,9 +79,12 @@ def test_render_stub_and_memory_stores():
     )
     bundle = render_bundle(result.items, meta)
     assert "my feed" in bundle
+    assert "### なぜ今見るか" in bundle
+    assert "### 壁打ちの問い" in bundle
     assert result.items[0].item.title in bundle
     single = render_single(result.items[0], meta)
     assert result.items[0].item.title in single
+    assert "Gemini への貼り付け" in single
 
     runs = InMemoryRunStore()
     run_id = runs.save_run(result)
