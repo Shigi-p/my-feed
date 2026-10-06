@@ -1,0 +1,7 @@
+# my-feed local config (C0 minimal shape)
+
+top_n = 10
+default_scorer = "fake"
+
+# Sources enabled for the pipeline. C0 ships only the fake adapter.
+enabled_sources = ["fake"]
