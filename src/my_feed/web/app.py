@@ -15,8 +15,21 @@ from my_feed.web.deps import WebDeps
 TEMPLATES_DIR = Path(__file__).resolve().parent / "templates"
 
 
+def _safe_next_url(next_url: str, *, default: str = "/") -> str:
+    """Allow only same-app relative paths (local tool; still avoid open redirects)."""
+    candidate = (next_url or "").strip() or default
+    if candidate.startswith("/") and not candidate.startswith("//"):
+        return candidate
+    return default
+
+
 def create_app(deps: WebDeps | None = None) -> FastAPI:
-    """Build the app with injectable stores / pipeline / renderer."""
+    """Build the app with injectable stores / pipeline / renderer.
+
+    Fetch runs synchronously inside the request (acceptable for Fake / local).
+    Real adapters at M2 may block for seconds — add timeouts, disable double
+    submit, or background jobs if that becomes painful.
+    """
     deps = deps or WebDeps()
     templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
     app = FastAPI(title="my feed", docs_url=None, redoc_url=None)
@@ -27,14 +40,19 @@ def create_app(deps: WebDeps | None = None) -> FastAPI:
         return runs[0] if runs else None
 
     def _favorite_ids() -> dict[str, str]:
-        """Map item.id -> favorite_id for buttons."""
+        """Map item.id -> favorite_id for buttons (read-only; no store writes)."""
         mapping: dict[str, str] = {}
-        # InMemoryFavoriteStore keeps ids internally; walk list + reverse lookup
-        # via add upsert: re-add is idempotent and returns existing id.
         store = deps.favorite_store
         for item in store.list():
-            mapping[item.id] = store.add(item)
+            fav_id = store.favorite_id_for(item.id)
+            if fav_id is not None:
+                mapping[item.id] = fav_id
         return mapping
+
+    def _scorer_choices() -> list[str]:
+        # ``fake`` stays listed while C0 demos need it. After M1, product may
+        # hide fake from the dropdown while keeping it registered for tests.
+        return deps.list_scorers_fn()
 
     @app.get("/", response_class=HTMLResponse)
     async def index(request: Request) -> HTMLResponse:
@@ -44,7 +62,7 @@ def create_app(deps: WebDeps | None = None) -> FastAPI:
             request,
             "index.html",
             {
-                "scorers": deps.list_scorers_fn(),
+                "scorers": _scorer_choices(),
                 "run_id": run_id,
                 "result": result,
                 "favorite_ids": _favorite_ids(),
@@ -54,6 +72,7 @@ def create_app(deps: WebDeps | None = None) -> FastAPI:
 
     @app.post("/runs")
     async def create_run(scorer: str = Form("fake")) -> RedirectResponse:
+        # Blocks until pipeline returns (see create_app docstring).
         config = deps.load_config_fn(deps.config_path)
         config = config.model_copy(update={"default_scorer": scorer})
         result = deps.run_pipeline_fn(config)
@@ -95,7 +114,7 @@ def create_app(deps: WebDeps | None = None) -> FastAPI:
                 "run_id": run_id,
                 "result": result,
                 "favorite_ids": _favorite_ids(),
-                "scorers": deps.list_scorers_fn(),
+                "scorers": _scorer_choices(),
                 "nav": "runs",
             },
         )
@@ -148,9 +167,12 @@ def create_app(deps: WebDeps | None = None) -> FastAPI:
 
     @app.get("/favorites", response_class=HTMLResponse)
     async def favorites_page(request: Request) -> HTMLResponse:
-        # Build (favorite_id, item) pairs without relying on store internals.
         items = deps.favorite_store.list()
-        pairs = [(deps.favorite_store.add(item), item) for item in items]
+        pairs = []
+        for item in items:
+            fav_id = deps.favorite_store.favorite_id_for(item.id)
+            if fav_id is not None:
+                pairs.append((fav_id, item))
         return templates.TemplateResponse(
             request,
             "favorites.html",
@@ -170,7 +192,7 @@ def create_app(deps: WebDeps | None = None) -> FastAPI:
         if scored is None:
             raise HTTPException(status_code=404, detail="item not found")
         deps.favorite_store.add(scored.item)
-        return RedirectResponse(url=next_url or "/", status_code=303)
+        return RedirectResponse(url=_safe_next_url(next_url), status_code=303)
 
     @app.delete("/favorites/{favorite_id}")
     async def delete_favorite(favorite_id: str) -> Response:
@@ -183,7 +205,10 @@ def create_app(deps: WebDeps | None = None) -> FastAPI:
         next_url: str = Form("/favorites", alias="next"),
     ) -> RedirectResponse:
         deps.favorite_store.remove(favorite_id)
-        return RedirectResponse(url=next_url or "/favorites", status_code=303)
+        return RedirectResponse(
+            url=_safe_next_url(next_url, default="/favorites"),
+            status_code=303,
+        )
 
     return app
 
