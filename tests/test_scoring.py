@@ -230,3 +230,35 @@ def test_scoring_config_keys_load(tmp_path):
     assert config.default_scorer == "hybrid"
     assert config.scoring.hybrid.recency_half_life_hours == 24
     assert config.scoring.hybrid.neutral_popularity_when_missing == 0.4
+
+
+def test_build_scorer_applies_config_knobs(tmp_path):
+    from my_feed.scoring import build_scorer
+
+    path = tmp_path / "config.toml"
+    path.write_text(
+        "\n".join(
+            [
+                'default_scorer = "hybrid"',
+                'enabled_sources = ["fake"]',
+                "[scoring.hybrid]",
+                "recency_half_life_hours = 12",
+                "neutral_popularity_when_missing = 0.25",
+                "",
+            ]
+        ),
+        encoding="utf-8",
+    )
+    config = load_config(path)
+    hybrid = build_scorer("hybrid", config)
+    assert isinstance(hybrid, HybridScoreStrategy)
+    assert hybrid._half_life_hours == 12
+    assert hybrid._neutral_popularity == 0.25
+    popularity = build_scorer("popularity", config)
+    assert popularity._neutral == 0.25
+
+
+def test_recency_factor_accepts_naive_published_at():
+    now = datetime(2026, 10, 6, 12, 0, tzinfo=UTC)
+    naive = datetime(2026, 10, 6, 6, 0)  # treated as UTC
+    assert recency_factor(naive, now=now, half_life_hours=6) == pytest.approx(0.5)

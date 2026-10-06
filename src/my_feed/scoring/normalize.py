@@ -10,6 +10,10 @@ from my_feed.models import Item
 NormalizeMethod = Literal["minmax", "rank"]
 
 # Preferred metric keys in priority order (sources expose different names).
+# First hit wins — e.g. an item with both likes and stocks uses likes only.
+# Note: GitHub adapters may also expose ``stars_today``; it is intentionally
+# NOT in this list today (all-time ``stars`` wins). Promote stars_today only
+# after an explicit product decision.
 POPULARITY_METRIC_KEYS: tuple[str, ...] = ("likes", "stocks", "stars", "forks")
 
 DEFAULT_NEUTRAL = 0.5
@@ -24,7 +28,13 @@ def extract_popularity(metrics: dict[str, float | int]) -> float | None:
 
 
 def _minmax(values: list[float]) -> list[float]:
-    """Map values to 0..1. Tied / single cohort → 1.0."""
+    """Map values to 0..1.
+
+    Tied or single-value cohorts → 1.0 for every present member. That means a
+    source that contributes only one item to a cross-source Top-N run gets a
+    perfect popularity component — known skew; switch to rank or dampen later
+    if it dominates hybrid rankings in practice.
+    """
     lo = min(values)
     hi = max(values)
     if hi == lo:

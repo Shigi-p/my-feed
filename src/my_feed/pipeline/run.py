@@ -7,7 +7,7 @@ from datetime import UTC, datetime
 
 from my_feed.config import AppConfig
 from my_feed.models import PipelineResult, PipelineStatus, ScoredItem
-from my_feed.scoring import get_scorer
+from my_feed.scoring import build_scorer
 from my_feed.sources import get_source
 
 logger = logging.getLogger(__name__)
@@ -40,7 +40,8 @@ def run_pipeline(config: AppConfig) -> PipelineResult:
         scored = []
         scorer_name = config.default_scorer
     else:
-        strategy = get_scorer(config.default_scorer)
+        # build_scorer (not get_scorer) so config.toml half-life / neutrals apply.
+        strategy = build_scorer(config.default_scorer, config)
         scorer_name = strategy.name
         scored = strategy.score(items)[: config.top_n]
         status = PipelineStatus.PARTIAL if source_errors else PipelineStatus.OK

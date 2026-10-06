@@ -2,10 +2,21 @@
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import UTC, datetime
 
 DEFAULT_HALF_LIFE_HOURS = 36.0
 DEFAULT_NEUTRAL_RECENCY = 0.5
+
+
+def _as_utc(dt: datetime) -> datetime:
+    """Normalize naive datetimes to UTC so subtraction against aware ``now`` works.
+
+    Adapters should prefer timezone-aware values; treating naive as UTC is a
+    defensive default, not a claim that the upstream clock was UTC.
+    """
+    if dt.tzinfo is None:
+        return dt.replace(tzinfo=UTC)
+    return dt.astimezone(UTC)
 
 
 def recency_factor(
@@ -18,7 +29,9 @@ def recency_factor(
     """Exponential decay from ``published_at``; missing timestamp → ``missing``."""
     if published_at is None:
         return missing
-    age_seconds = (now - published_at).total_seconds()
+    published = _as_utc(published_at)
+    now_utc = _as_utc(now)
+    age_seconds = (now_utc - published).total_seconds()
     age_hours = max(0.0, age_seconds / 3600.0)
     if half_life_hours <= 0:
         return 0.0 if age_hours > 0 else 1.0
