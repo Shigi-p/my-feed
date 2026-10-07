@@ -52,7 +52,7 @@ class GeminiSummarizer:
             item: The article to summarize
             
         Returns:
-            A 3-4 line summary, or None if the API call fails.
+            A detailed summary (5-8 lines), or None if the API call fails.
         """
         try:
             prompt = self._build_prompt(item)
@@ -62,8 +62,11 @@ class GeminiSummarizer:
                 input=prompt,
                 tools=[{"type": "url_context"}],
                 generation_config={
-                    "temperature": self._temperature,
-                    "max_output_tokens": self._max_output_tokens,
+                    "temperature": self._TEMPERATURE,
+                    "max_output_tokens": self._MAX_OUTPUT_TOKENS,
+                    "thinking_config": {
+                        "thinking_level": self._THINKING_LEVEL,
+                    },
                 },
             )
             
