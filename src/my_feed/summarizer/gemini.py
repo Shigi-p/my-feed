@@ -20,11 +20,12 @@ class GeminiSummarizer:
     Technical parameters are optimized for summarization tasks:
     - thinking_level: "minimal" (Flash-Lite default, cost-efficient)
     - max_output_tokens: 3000 (enough for thinking + detailed summary)
-    - temperature: 0.3 (stable, factual output)
+    - temperature: 1.0 (Gemini 3.x official default, DO NOT CHANGE per docs)
     """
 
     # Technical parameters (hardcoded for optimal summarization)
-    _TEMPERATURE = 0.3
+    # DO NOT CHANGE: Gemini 3.x is optimized for default temperature=1.0
+    _TEMPERATURE = 1.0
     _MAX_OUTPUT_TOKENS = 3000
     _THINKING_LEVEL = "minimal"
 

@@ -91,6 +91,12 @@ def test_summarize_simple() -> None:
         print(f"   詳細: {exc}")
         print()
         
+        # 詳細なトレースバック
+        import traceback
+        print("--- 詳細なエラー情報 ---")
+        traceback.print_exc()
+        print()
+        
         # よくあるエラーのヒント
         error_msg = str(exc).lower()
         if "403" in error_msg or "forbidden" in error_msg:
@@ -110,9 +116,10 @@ def test_summarize_simple() -> None:
         elif "500" in error_msg or "503" in error_msg:
             print("💡 ヒント: Gemini API側のエラーです")
             print("   - しばらく待ってから再試行してください")
-        else:
-            print("💡 詳しいエラー情報を確認するには:")
-            print("   import traceback; traceback.print_exc() を追加してください")
+        elif "attribute" in error_msg:
+            print("💡 ヒント: 属性エラーです")
+            print("   - SummarizerConfig や GeminiSummarizer の実装を確認してください")
+            print("   - config.model が存在するか確認してください")
         
         sys.exit(1)
 
