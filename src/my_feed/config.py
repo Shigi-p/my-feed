@@ -32,14 +32,16 @@ class ScoringConfig(BaseModel):
 
 
 class SummarizerConfig(BaseModel):
-    """AI summarization settings (M4-D)."""
+    """AI summarization settings (M4-D).
+    
+    Technical parameters (temperature, max_output_tokens, thinking_level) are
+    hardcoded in the implementation. Users only need to toggle enabled and
+    optionally choose a different model.
+    """
 
-    enabled: bool = True
-    provider: str = "gemini"
-    model: str = "gemini-3.5-flash"
+    enabled: bool = False
+    model: str = "gemini-3.5-flash-lite"
     api_key_env: str = "GEMINI_API_KEY"
-    temperature: float = 0.3
-    max_output_tokens: int = 200
 
     def get_api_key(self) -> str | None:
         """Read API key from environment variable."""

@@ -10,13 +10,11 @@ enabled_sources = ["zenn", "qiita", "gigazine", "github_trending"]
 recency_half_life_hours = 36
 neutral_popularity_when_missing = 0.5
 
-# AI Summarization (M4-D). Enabled by default.
+# AI Summarization (M4-D). Enabled by default for real-source runs.
 # Set GEMINI_API_KEY environment variable before running:
 #   export GEMINI_API_KEY="your-api-key-here"
+# Technical parameters (temperature=0.3, max_output_tokens=3000, thinking_level=minimal)
+# are optimized for cost-efficiency and are hardcoded in the implementation.
 [summarizer]
 enabled = true
-provider = "gemini"
-model = "gemini-3.5-flash"
-api_key_env = "GEMINI_API_KEY"
-temperature = 0.3
-max_output_tokens = 200
+model = "gemini-3.5-flash-lite"

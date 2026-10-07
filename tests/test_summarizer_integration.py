@@ -6,15 +6,15 @@ from my_feed.pipeline import run_pipeline
 
 
 def test_pipeline_with_fake_summarizer() -> None:
-    """Pipeline runs with summarizer enabled and generates summaries."""
+    """Pipeline runs with summarizer enabled (uses Gemini by default)."""
     config = AppConfig(
         top_n=3,
         default_scorer="fake",
         enabled_sources=[SourceName.FAKE],
     )
-    # Fake doesn't need API key, so enabled=True should work
+    # Note: with summarizer enabled but no API key, _build_summarizer returns None
+    # So summaries won't actually be generated, but pipeline should not crash
     config.summarizer.enabled = True
-    config.summarizer.provider = "fake"  # Will be ignored, but safe
 
     # Run pipeline - should not crash even with summarizer enabled
     result = run_pipeline(config)
@@ -22,9 +22,9 @@ def test_pipeline_with_fake_summarizer() -> None:
     assert result.status.value == "ok"
     assert len(result.items) <= 3
 
-    # With fake source + fake summarizer, summaries won't be generated
-    # because _build_summarizer only handles "gemini" provider
-    # This is expected behavior
+    # Without API key, summaries won't be generated
+    for scored_item in result.items:
+        assert scored_item.summary is None
 
 
 def test_pipeline_with_summarizer_disabled() -> None:
