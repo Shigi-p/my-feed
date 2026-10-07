@@ -41,9 +41,7 @@ class HybridScoreStrategy:
 
     def score(self, items: list[Item]) -> list[ScoredItem]:
         now = self._now or datetime.now(UTC)
-        norms = normalize_popularity_by_source(
-            items, method=self._method, neutral=self._neutral_popularity
-        )
+        norms = normalize_popularity_by_source(items, method=self._method, neutral=self._neutral_popularity)
         scored: list[ScoredItem] = []
         for item in items:
             pop = norms[item.id]

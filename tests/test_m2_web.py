@@ -184,4 +184,4 @@ def test_fetch_form_defaults_to_hybrid_when_no_result():
     client = TestClient(create_app(deps))
     home = client.get("/")
     assert home.status_code == 200
-    assert 'value="hybrid" selected' in home.text or "value=\"hybrid\" selected" in home.text
+    assert 'value="hybrid" selected' in home.text or 'value="hybrid" selected' in home.text

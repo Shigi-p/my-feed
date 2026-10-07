@@ -32,13 +32,13 @@ def test_api_key() -> str | None:
     """APIキーが設定されているか確認"""
     config = SummarizerConfig()
     api_key = config.get_api_key()
-    
+
     if not api_key:
-        print(f"❌ APIキーが設定されていません")
+        print("❌ APIキーが設定されていません")
         print(f"   環境変数 {config.api_key_env} を確認してください")
-        print(f"   .env ファイルがあるか確認: ls -la .env")
+        print("   .env ファイルがあるか確認: ls -la .env")
         return None
-    
+
     # APIキーをマスク表示
     masked = f"{api_key[:8]}...{api_key[-4:]}" if len(api_key) > 12 else "***"
     print(f"✅ APIキーを検出: {masked}")
@@ -50,9 +50,9 @@ def test_summarize_simple() -> None:
     api_key = test_api_key()
     if not api_key:
         return
-    
+
     print("\n--- テスト記事で要約を試します ---")
-    
+
     # テスト用の記事（実在する技術記事）
     test_item = Item(
         id="test:example",
@@ -62,41 +62,41 @@ def test_summarize_simple() -> None:
         tags=["Python", "asyncio"],
         fetched_at=datetime.now(UTC),
     )
-    
+
     print(f"記事タイトル: {test_item.title}")
     print(f"記事URL: {test_item.url}")
     print(f"タグ: {', '.join(test_item.tags)}")
     print()
-    
+
     try:
         config = SummarizerConfig()
         summarizer = GeminiSummarizer(
             api_key=api_key,
             model=config.model,
         )
-        
+
         print("⏳ Gemini APIに要約をリクエスト中...")
         summary = summarizer.summarize(test_item)
-        
+
         if summary:
-            print(f"✅ 要約に成功しました！\n")
+            print("✅ 要約に成功しました！\n")
             print("=" * 60)
             print(summary)
             print("=" * 60)
         else:
             print("⚠️  要約が空でした（API呼び出しは成功したが結果なし）")
-        
+
     except Exception as exc:
         print(f"❌ エラーが発生しました: {type(exc).__name__}")
         print(f"   詳細: {exc}")
         print()
-        
+
         # 詳細なトレースバック
         import traceback
         print("--- 詳細なエラー情報 ---")
         traceback.print_exc()
         print()
-        
+
         # よくあるエラーのヒント
         error_msg = str(exc).lower()
         if "403" in error_msg or "forbidden" in error_msg:
@@ -120,7 +120,7 @@ def test_summarize_simple() -> None:
             print("💡 ヒント: 属性エラーです")
             print("   - SummarizerConfig や GeminiSummarizer の実装を確認してください")
             print("   - config.model が存在するか確認してください")
-        
+
         sys.exit(1)
 
 
@@ -129,9 +129,9 @@ def main() -> None:
     print("Gemini API 要約機能の診断スクリプト")
     print("=" * 60)
     print()
-    
+
     test_summarize_simple()
-    
+
     print()
     print("=" * 60)
     print("✅ テスト完了")

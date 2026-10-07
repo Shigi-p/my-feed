@@ -33,9 +33,9 @@ print(f"✅ API Key found: {api_key[:8]}...{api_key[-4:]}")
 print("\n[2] Basic Gemini API Test (without URL Context)")
 try:
     from google import genai
-    
+
     client = genai.Client(api_key=api_key)
-    
+
     print("Sending test request...")
     response = client.interactions.create(
         model="gemini-3.5-flash",
@@ -45,9 +45,9 @@ try:
             "max_output_tokens": 50,
         }
     )
-    
+
     print(f"✅ Response: {response.output_text.strip()}")
-    
+
 except Exception as e:
     print(f"❌ Error: {type(e).__name__}: {e}")
     print("\nFull error:")
@@ -60,7 +60,7 @@ print("\n[3] URL Context Test")
 try:
     test_url = "https://example.com"
     print(f"Testing with URL: {test_url}")
-    
+
     response = client.interactions.create(
         model="gemini-3.5-flash",
         input=f"この記事の内容を1行で要約してください: {test_url}",
@@ -70,16 +70,16 @@ try:
             "max_output_tokens": 200,
         }
     )
-    
+
     summary = response.output_text.strip()
     print(f"✅ Summary: {summary}")
-    
+
 except Exception as e:
     print(f"❌ Error: {type(e).__name__}: {e}")
     print("\nFull error:")
     import traceback
     traceback.print_exc()
-    
+
     print("\nPossible causes:")
     print("  - URL Context not available in your API plan")
     print("  - API key doesn't have proper permissions")
@@ -90,9 +90,10 @@ except Exception as e:
 print("\n[4] Real Article Test")
 try:
     from datetime import UTC, datetime
+
     from my_feed.models import Item, SourceName
     from my_feed.summarizer import GeminiSummarizer
-    
+
     # Create test item
     item = Item(
         id="test:1",
@@ -102,18 +103,18 @@ try:
         fetched_at=datetime.now(UTC),
         tags=["test"],
     )
-    
+
     summarizer = GeminiSummarizer(api_key=api_key)
     print(f"Summarizing: {item.url}")
-    
+
     summary = summarizer.summarize(item)
-    
+
     if summary:
         print(f"✅ Summary generated ({len(summary)} chars):")
         print(f"   {summary[:100]}...")
     else:
         print("❌ Summary is None")
-    
+
 except Exception as e:
     print(f"❌ Error: {type(e).__name__}: {e}")
     import traceback

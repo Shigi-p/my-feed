@@ -137,9 +137,7 @@ def create_app(deps: WebDeps | None = None) -> FastAPI:
         return Response(
             content=body,
             media_type="text/markdown; charset=utf-8",
-            headers={
-                "Content-Disposition": f'attachment; filename="{filename}"'
-            },
+            headers={"Content-Disposition": f'attachment; filename="{filename}"'},
         )
 
     @app.get("/runs/{run_id}/items/{item_id:path}/markdown")
@@ -164,9 +162,7 @@ def create_app(deps: WebDeps | None = None) -> FastAPI:
         return Response(
             content=body,
             media_type="text/markdown; charset=utf-8",
-            headers={
-                "Content-Disposition": f'attachment; filename="{filename}"'
-            },
+            headers={"Content-Disposition": f'attachment; filename="{filename}"'},
         )
 
     @app.get("/favorites", response_class=HTMLResponse)

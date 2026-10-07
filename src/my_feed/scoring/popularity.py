@@ -27,9 +27,7 @@ class PopularityScoreStrategy:
         return "popularity"
 
     def score(self, items: list[Item]) -> list[ScoredItem]:
-        norms = normalize_popularity_by_source(
-            items, method=self._method, neutral=self._neutral
-        )
+        norms = normalize_popularity_by_source(items, method=self._method, neutral=self._neutral)
         scored: list[ScoredItem] = []
         for item in items:
             pop = norms[item.id]

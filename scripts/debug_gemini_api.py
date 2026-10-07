@@ -32,7 +32,7 @@ def check_environment():
     print("=" * 60)
     print("環境変数チェック")
     print("=" * 60)
-    
+
     api_key = os.getenv("GEMINI_API_KEY")
     if api_key:
         masked = f"{api_key[:8]}...{api_key[-4:]}" if len(api_key) > 12 else "***"
@@ -41,14 +41,14 @@ def check_environment():
     else:
         print("❌ GEMINI_API_KEY が設定されていません")
         return False
-    
+
     # .envファイルの存在確認
     env_path = Path.cwd() / ".env"
     if env_path.exists():
         print(f"✅ .env ファイルが存在します: {env_path}")
     else:
         print(f"⚠️  .env ファイルが見つかりません: {env_path}")
-    
+
     return True
 
 
@@ -57,10 +57,10 @@ def test_google_genai_import():
     print("\n" + "=" * 60)
     print("google.genai ライブラリのインポートテスト")
     print("=" * 60)
-    
+
     try:
         from google import genai
-        print(f"✅ google.genai をインポートできました")
+        print("✅ google.genai をインポートできました")
         print(f"   バージョン: {getattr(genai, '__version__', '不明')}")
         return True
     except ImportError as exc:
@@ -73,34 +73,34 @@ def test_simple_api_call():
     print("\n" + "=" * 60)
     print("Gemini API 接続テスト（テキストのみ）")
     print("=" * 60)
-    
+
     api_key = os.getenv("GEMINI_API_KEY")
     if not api_key:
         print("❌ APIキーがありません")
         return
-    
+
     try:
         from google import genai
-        
+
         print("⏳ クライアントを初期化中...")
         client = genai.Client(api_key=api_key)
         print("✅ クライアント初期化成功")
-        
+
         print("⏳ シンプルなテキスト生成をリクエスト中...")
         print("   プロンプト: 'こんにちは'")
-        
+
         response = client.models.generate_content(
             model="gemini-3.5-flash",
             contents="こんにちは"
         )
-        
-        print(f"✅ API呼び出し成功！")
+
+        print("✅ API呼び出し成功！")
         print(f"   レスポンス: {response.text[:100]}...")
-        
+
     except Exception as exc:
         print(f"❌ エラー: {type(exc).__name__}")
         print(f"   メッセージ: {exc}")
-        
+
         # 詳細なトレースバック
         import traceback
         print("\n--- 詳細なエラー情報 ---")
@@ -112,35 +112,35 @@ def test_url_context():
     print("\n" + "=" * 60)
     print("URL Context 機能のテスト")
     print("=" * 60)
-    
+
     api_key = os.getenv("GEMINI_API_KEY")
     if not api_key:
         print("❌ APIキーがありません")
         return
-    
+
     try:
         from google import genai
-        
+
         client = genai.Client(api_key=api_key)
-        
+
         test_url = "https://www.python.org/"
-        print(f"⏳ URL Context でリクエスト中...")
+        print("⏳ URL Context でリクエスト中...")
         print(f"   URL: {test_url}")
-        print(f"   プロンプト: 'このサイトを1行で説明してください'")
-        
+        print("   プロンプト: 'このサイトを1行で説明してください'")
+
         interaction = client.interactions.create(
             model="gemini-3.5-flash",
             input=f"このサイトを1行で説明してください: {test_url}",
             tools=[{"type": "url_context"}],
         )
-        
-        print(f"✅ URL Context 呼び出し成功！")
+
+        print("✅ URL Context 呼び出し成功！")
         print(f"   レスポンス: {interaction.output_text[:200]}...")
-        
+
     except Exception as exc:
         print(f"❌ エラー: {type(exc).__name__}")
         print(f"   メッセージ: {exc}")
-        
+
         import traceback
         print("\n--- 詳細なエラー情報 ---")
         traceback.print_exc()
@@ -151,18 +151,18 @@ def main():
     print("Gemini API 詳細診断スクリプト")
     print("=" * 60)
     print()
-    
+
     if not check_environment():
         print("\n❌ 環境変数の設定に問題があります")
         sys.exit(1)
-    
+
     if not test_google_genai_import():
         print("\n❌ ライブラリのインポートに失敗しました")
         sys.exit(1)
-    
+
     test_simple_api_call()
     test_url_context()
-    
+
     print("\n" + "=" * 60)
     print("診断完了")
     print("=" * 60)

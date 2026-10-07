@@ -60,9 +60,7 @@ def test_real_sources_are_registered():
 
 
 def test_run_pipeline_returns_top_n():
-    result = run_pipeline(
-        AppConfig(top_n=10, default_scorer="fake", enabled_sources=[SourceName.FAKE])
-    )
+    result = run_pipeline(AppConfig(top_n=10, default_scorer="fake", enabled_sources=[SourceName.FAKE]))
     assert result.status == PipelineStatus.OK
     assert result.scorer == "fake"
     assert len(result.items) == 10

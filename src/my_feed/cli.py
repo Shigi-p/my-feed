@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Annotated, Optional
+from typing import Annotated
 
 import typer
 
@@ -20,14 +20,12 @@ app = typer.Typer(help="my-feed: tech catch-up feed", no_args_is_help=True)
 
 @app.command("run")
 def run_cmd(
-    top: Annotated[Optional[int], typer.Option("--top", help="Number of items")] = None,
-    scorer: Annotated[Optional[str], typer.Option("--scorer", help="Score strategy name")] = None,
+    top: Annotated[int | None, typer.Option("--top", help="Number of items")] = None,
+    scorer: Annotated[str | None, typer.Option("--scorer", help="Score strategy name")] = None,
     config_path: Annotated[Path, typer.Option("--config", help="Path to config.toml")] = Path("config.toml"),
     as_json: Annotated[bool, typer.Option("--json", help="Print JSON")] = False,
-    out: Annotated[Optional[Path], typer.Option("--out", help="Write JSON to file")] = None,
-    out_md: Annotated[
-        Optional[Path], typer.Option("--out-md", help="Write Gemini-ready markdown")
-    ] = None,
+    out: Annotated[Path | None, typer.Option("--out", help="Write JSON to file")] = None,
+    out_md: Annotated[Path | None, typer.Option("--out-md", help="Write Gemini-ready markdown")] = None,
 ) -> None:
     """Fetch → score → top N (sources/scorer from config.toml or flags)."""
     config = load_config(config_path)
@@ -55,9 +53,7 @@ def run_cmd(
         typer.echo("")
         typer.echo(f"{'rank':<4} {'score':>8}  {'source':<16}  title")
         for i, scored in enumerate(result.items, start=1):
-            typer.echo(
-                f"{i:<4} {scored.score:>8.2f}  {scored.item.source.value:<16}  {scored.item.title}"
-            )
+            typer.echo(f"{i:<4} {scored.score:>8.2f}  {scored.item.source.value:<16}  {scored.item.title}")
 
     if out_md is not None:
         meta = RenderMeta(

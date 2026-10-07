@@ -24,8 +24,7 @@ _SOURCE_HINTS: dict[SourceName, str] = {
 }
 
 DEFAULT_GEMINI_INTRO = (
-    "以下を Gemini / ChatGPT に貼り付けて、気になる記事について"
-    "深掘り・反論・実践案を壁打ちしてください。"
+    "以下を Gemini / ChatGPT に貼り付けて、気になる記事について深掘り・反論・実践案を壁打ちしてください。"
 )
 
 
@@ -53,11 +52,7 @@ def format_excerpt(
     if not plain:
         return ""
 
-    parts = [
-        p.strip()
-        for p in re.split(r"(?<=[。．！？!?])\s*|(?<=\.)\s+", plain)
-        if p.strip()
-    ]
+    parts = [p.strip() for p in re.split(r"(?<=[。．！？!?])\s*|(?<=\.)\s+", plain) if p.strip()]
     if not parts:
         parts = [plain]
 
@@ -131,9 +126,7 @@ def brainstorm_prompts(item: Item) -> list[str]:
     title = (item.title or "この記事").strip() or "この記事"
     tags = ", ".join(item.tags[:5]) if item.tags else ""
 
-    summary = (
-        f"「{title}」の主張を 3 点で要約し、自分の現プロジェクトに効く / 効かない理由を分けてください。"
-    )
+    summary = f"「{title}」の主張を 3 点で要約し、自分の現プロジェクトに効く / 効かない理由を分けてください。"
     if tags:
         summary = (
             f"「{title}」（タグ: {tags}）の主張を 3 点で要約し、"

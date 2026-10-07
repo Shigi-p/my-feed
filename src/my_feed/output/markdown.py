@@ -20,9 +20,7 @@ from my_feed.output.formatters import (
 )
 
 
-def _render_item_block(
-    scored: ScoredItem, *, index: int | None, now: datetime
-) -> list[str]:
+def _render_item_block(scored: ScoredItem, *, index: int | None, now: datetime) -> list[str]:
     item = scored.item
     title = item.title.strip() if item.title else "(無題)"
     heading = f"## {index}. {title}" if index is not None else f"## {title}"
@@ -40,11 +38,13 @@ def _render_item_block(
 
     # AI要約（M4-D）
     if scored.summary:
-        lines.extend([
-            "### AI要約",
-            scored.summary,
-            "",
-        ])
+        lines.extend(
+            [
+                "### AI要約",
+                scored.summary,
+                "",
+            ]
+        )
 
     excerpt = format_excerpt(item.excerpt)
     lines.extend(
