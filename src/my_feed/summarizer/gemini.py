@@ -91,7 +91,8 @@ class GeminiSummarizer:
             # Log the error but don't propagate — pipeline should continue
             logger.warning(
                 f"Failed to summarize {item.id} ({item.url}): "
-                f"{type(exc).__name__}"
+                f"{type(exc).__name__}: {exc}",
+                exc_info=True  # Include full traceback for debugging
             )
             return None
 
