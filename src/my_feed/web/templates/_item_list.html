@@ -10,6 +10,11 @@
       <div class="meta">
         {{ item.source.value }} · score {{ "%.2f"|format(scored.score) }}
       </div>
+      {% if scored.summary %}
+      <div class="summary">
+        <strong>AI要約:</strong> {{ scored.summary }}
+      </div>
+      {% endif %}
     </div>
     <div class="actions">
       {% if favorite_ids.get(item.id) %}

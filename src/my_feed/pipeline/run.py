@@ -1,4 +1,4 @@
-"""Fetch → score → top N pipeline."""
+"""Fetch → score → summarize → top N pipeline."""
 
 from __future__ import annotations
 
@@ -9,8 +9,31 @@ from my_feed.config import AppConfig
 from my_feed.models import PipelineResult, PipelineStatus, ScoredItem
 from my_feed.scoring import build_scorer
 from my_feed.sources import get_source
+from my_feed.summarizer import FakeSummarizer, GeminiSummarizer, SummarizerAdapter
 
 logger = logging.getLogger(__name__)
+
+
+def _build_summarizer(config: AppConfig) -> SummarizerAdapter | None:
+    """設定から summarizer を構築。無効または利用不可の場合は None。"""
+    if not config.summarizer.enabled:
+        return None
+
+    api_key = config.summarizer.get_api_key()
+    if not api_key:
+        logger.warning(
+            f"Summarizer enabled but {config.summarizer.api_key_env} not set. "
+            f"Summaries will be skipped. "
+            f"To enable: create .env file with '{config.summarizer.api_key_env}=your-key' "
+            f"or export {config.summarizer.api_key_env}=your-key"
+        )
+        return None
+
+    # Currently only Gemini is supported
+    return GeminiSummarizer(
+        api_key=api_key,
+        model=config.summarizer.model,
+    )
 
 
 def run_pipeline(config: AppConfig) -> PipelineResult:
@@ -45,6 +68,14 @@ def run_pipeline(config: AppConfig) -> PipelineResult:
         scorer_name = strategy.name
         scored = strategy.score(items)[: config.top_n]
         status = PipelineStatus.PARTIAL if source_errors else PipelineStatus.OK
+
+        # Summarize top N items (M4-D)
+        summarizer = _build_summarizer(config)
+        if summarizer:
+            logger.info(f"Summarizing {len(scored)} items with {config.summarizer.model}")
+            for scored_item in scored:
+                summary = summarizer.summarize(scored_item.item)
+                scored_item.summary = summary
 
     return PipelineResult(
         items=scored,

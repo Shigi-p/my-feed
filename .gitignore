@@ -13,3 +13,4 @@ data/
 result.json
 out/
 config.local.toml
+.env

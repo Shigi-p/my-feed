@@ -36,10 +36,19 @@ def _render_item_block(
     if item.tags:
         lines.append(f"- tags: {', '.join(item.tags)}")
 
+    lines.append("")
+
+    # AI要約（M4-D）
+    if scored.summary:
+        lines.extend([
+            "### AI要約",
+            scored.summary,
+            "",
+        ])
+
     excerpt = format_excerpt(item.excerpt)
     lines.extend(
         [
-            "",
             "### 抜粋",
             excerpt if excerpt else "（抜粋なし）",
             "",

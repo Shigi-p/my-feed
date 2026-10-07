@@ -49,6 +49,7 @@ class ScoredItem(BaseModel):
     item: Item
     score: float
     score_breakdown: dict[str, float] = Field(default_factory=dict)
+    summary: str | None = None
 
 
 class PipelineResult(BaseModel):
