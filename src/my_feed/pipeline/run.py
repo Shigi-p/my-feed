@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 
 def _build_summarizer(config: AppConfig) -> SummarizerAdapter | None:
-    """Build a summarizer from config, or None if disabled/unavailable."""
+    """設定から summarizer を構築。無効または利用不可の場合は None。"""
     if not config.summarizer.enabled:
         return None
 
@@ -23,7 +23,9 @@ def _build_summarizer(config: AppConfig) -> SummarizerAdapter | None:
     if not api_key:
         logger.warning(
             f"Summarizer enabled but {config.summarizer.api_key_env} not set. "
-            f"Summaries will be skipped."
+            f"Summaries will be skipped. "
+            f"To enable: create .env file with '{config.summarizer.api_key_env}=your-key' "
+            f"or export {config.summarizer.api_key_env}=your-key"
         )
         return None
 
@@ -32,13 +34,6 @@ def _build_summarizer(config: AppConfig) -> SummarizerAdapter | None:
         api_key=api_key,
         model=config.summarizer.model,
     )
-
-
-def _mask_api_key(key: str | None) -> str:
-    """Mask API key for logging."""
-    if not key:
-        return "(not set)"
-    return f"{key[:8]}...{key[-4:]}" if len(key) > 12 else "***"
 
 
 def run_pipeline(config: AppConfig) -> PipelineResult:

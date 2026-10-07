@@ -8,19 +8,19 @@ from my_feed.models import Item
 
 
 class SummarizerAdapter(Protocol):
-    """Contract for article summarization engines.
+    """記事要約エンジンの契約。
     
-    Implementations fetch article content and generate concise summaries.
-    Failures return None rather than raising, so the pipeline can continue.
+    実装は記事コンテンツを取得し、簡潔な要約を生成する。
+    失敗時は例外を上げずに None を返し、パイプラインを継続させる。
     """
 
     def summarize(self, item: Item) -> str | None:
-        """Generate a 3-4 line summary of the article.
+        """記事の要約を生成する。
         
         Args:
-            item: The article to summarize (URL, title, tags, etc.)
+            item: 要約対象の記事（URL、タイトル、タグ等）
             
         Returns:
-            A concise summary (150-200 chars), or None if summarization fails.
+            詳細な要約（5-8行、300〜500文字程度）。失敗時は None。
         """
         ...

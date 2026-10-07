@@ -12,22 +12,24 @@ logger = logging.getLogger(__name__)
 
 
 class GeminiSummarizer:
-    """Summarize articles using Gemini 3.5 Flash Lite + URL Context.
+    """Gemini 3.5 Flash Lite + URL Context による記事要約。
     
-    URL Context allows Gemini to fetch and analyze the full article content
-    directly from the URL, without requiring manual HTML parsing.
+    URL Context により、Gemini が記事 URL から直接コンテンツを取得・分析する。
+    手動での HTML パースは不要。
     
-    Technical parameters are optimized for summarization tasks:
-    - thinking_level: "minimal" (Flash-Lite default, cost-efficient)
-    - max_output_tokens: 3000 (enough for thinking + detailed summary)
-    - temperature: 1.0 (Gemini 3.x official default, DO NOT CHANGE per docs)
+    技術パラメータは要約タスク向けに最適化:
+    - thinking_level: "minimal" (Flash-Lite のデフォルト、コスト効率的)
+    - max_output_tokens: 3000 (thinking + 詳細要約に十分)
+    - temperature: 1.0 (Gemini 3.x 公式デフォルト、変更禁止)
+    - timeout: 30秒 (URL Context は記事取得を含むため長め)
     """
 
-    # Technical parameters (hardcoded for optimal summarization)
-    # DO NOT CHANGE: Gemini 3.x is optimized for default temperature=1.0
+    # 技術パラメータ（要約に最適化された固定値）
+    # 変更禁止: Gemini 3.x は temperature=1.0 で最適化されている
     _TEMPERATURE = 1.0
     _MAX_OUTPUT_TOKENS = 3000
     _THINKING_LEVEL = "minimal"
+    _TIMEOUT_SECONDS = 30
 
     def __init__(
         self,
@@ -35,24 +37,29 @@ class GeminiSummarizer:
         *,
         model: str = "gemini-3.5-flash-lite",
     ) -> None:
-        """Initialize Gemini client.
+        """Gemini クライアントを初期化。
         
         Args:
-            api_key: Gemini API key
-            model: Model name (default: gemini-3.5-flash-lite)
+            api_key: Gemini API キー
+            model: モデル名（デフォルト: gemini-3.5-flash-lite）
         """
         self._api_key = api_key
         self._model = model
-        self._client = genai.Client(api_key=api_key)
+        # タイムアウト設定付きでクライアントを初期化
+        # URL Context は記事取得も含むため、通常の API より長めに設定
+        self._client = genai.Client(
+            api_key=api_key,
+            http_options={"timeout": self._TIMEOUT_SECONDS}
+        )
 
     def summarize(self, item: Item) -> str | None:
-        """Generate a summary using URL Context.
+        """URL Context を使って要約を生成。
         
         Args:
-            item: The article to summarize
+            item: 要約対象の記事
             
         Returns:
-            A detailed summary (5-8 lines), or None if the API call fails.
+            詳細な要約（5-8行）。API 呼び出し失敗時は None。
         """
         try:
             prompt = self._build_prompt(item)
@@ -97,9 +104,9 @@ class GeminiSummarizer:
             return None
 
     def _build_prompt(self, item: Item) -> str:
-        """Build the prompt for Gemini.
+        """Gemini 用のプロンプトを構築。
         
-        Includes URL (for URL Context), title, and optional tags.
+        URL（URL Context 用）、タイトル、オプションのタグを含む。
         """
         prompt_parts = [
             "以下の技術記事を5-8行（300〜500文字程度）で要約してください。",
