@@ -94,7 +94,7 @@
 
 ## 4. 既存CI基盤との関係
 
-### 現在の CI 構成（PR #14 でマージ済み）
+### 現在の CI 構成（PR #14, #16 でマージ済み）
 
 ```yaml
 # .github/workflows/ci.yml
@@ -106,10 +106,18 @@ on:
 jobs:
   - lint (Ruff check + format check)
   - type-check (mypy)
-  - test (pytest, network tests 除外)
+  - test (pytest with coverage, network tests 除外)
+    - カバレッジ測定（pytest-cov）
+    - Codecov へアップロード（PR 時）
+    - HTML レポートを Artifact として保存（30日間）
 ```
 
 **目的**: コード品質保証（PR レビュー時 + main マージ時）
+
+**追加機能（PR #16）**:
+- **pre-commit フック**: Ruff、trailing-whitespace、Conventional Commits 等
+- **テストカバレッジ**: pytest-cov による測定、現在 86.23%
+- **Issue テンプレート**: バグ報告、機能リクエスト、ドキュメント改善
 
 ### 新規追加する定期取得ワークフロー
 
@@ -134,8 +142,9 @@ jobs:
 | **トリガー** | PR + main への push | cron (1日1回) + 手動 |
 | **目的** | コード品質チェック | データ更新 |
 | **git 操作** | なし（read-only） | commit & push (`[skip ci]`) |
-| **Secrets** | なし | `GEMINI_API_KEY` |
-| **実行時間** | 〜2分 | 〜5分（API呼び出し含む） |
+| **Secrets** | `CODECOV_TOKEN`（オプション） | `GEMINI_API_KEY`（必須） |
+| **実行時間** | 〜2-3分（カバレッジ含む） | 〜5分（API呼び出し含む） |
+| **Artifact** | coverage HTML レポート（30日） | なし |
 
 ### `[skip ci]` の必要性
 
@@ -148,11 +157,18 @@ jobs:
 git commit -m "chore: update feed [skip ci]"
 ```
 
+### pre-commit フックとの関係
+
+- **定期取得ワークフロー**: GitHub Actions 内で直接 `git commit` するため、**pre-commit フックは実行されない**
+- **ローカル開発**: 開発者が手動で変更をコミットする際は pre-commit が実行される
+- **影響**: 定期取得のコミットは pre-commit のチェックをバイパスするが、生成される JSON ファイルのみなので品質上の問題はない
+
 ### 将来の拡張可能性
 
 - 共通ステップ（uv setup など）の composite action 化
 - 定期取得失敗時の Slack 通知（別ワークフローとして追加）
 - フィード更新後の自動デプロイ（M4 以降）
+- 定期取得ワークフローでも pre-commit 相当のチェックを実行（必要に応じて）
 
 ---
 
@@ -160,10 +176,14 @@ git commit -m "chore: update feed [skip ci]"
 
 ### T0. 既存CI基盤の確認
 
-- [x] `.github/workflows/ci.yml` が存在（PR #14 でマージ済み）
-  - lint (Ruff)、typecheck (mypy)、test (pytest) を実行
+- [x] `.github/workflows/ci.yml` が存在（PR #14, #16 でマージ済み）
+  - lint (Ruff)、typecheck (mypy)、test (pytest with coverage) を実行
   - トリガー: `pull_request` と `push: branches: [main]`
-- [x] `Makefile` でローカルCI相当の操作が可能
+  - カバレッジ測定、Codecov アップロード、Artifact 保存
+- [x] `.pre-commit-config.yaml` が存在（PR #16 でマージ済み）
+  - Ruff、trailing-whitespace、Conventional Commits 等
+  - GitHub Actions 内のコミットでは実行されない（pre-commit フックはローカルのみ）
+- [x] `Makefile` でローカルCI相当の操作が可能（`make ci`, `make test-cov` 等）
 - [ ] 定期取得ワークフローが `ci.yml` と干渉しないことを確認
 - **完了条件**: 新ワークフローのコミットが `[skip ci]` でCIをスキップできる
 
@@ -215,12 +235,13 @@ git commit -m "chore: update feed [skip ci]"
 - [ ] GitHub Actions が毎日 UTC 00:00 に自動実行される
 - [ ] Actions が成功して `data/latest-feed.json` が更新・コミットされる
 - [ ] 定期取得のコミット（`[skip ci]` 付き）が既存の `ci.yml` をトリガーしない
-- [ ] 既存の CI ワークフロー（lint/typecheck/test）が正常に動作し続ける
+- [ ] 既存の CI ワークフロー（lint/typecheck/test/coverage）が正常に動作し続ける
 - [ ] Web アプリ起動時に自動的に最新データがロードされる
 - [ ] ブラウザアクセスで即座にフィードが表示される（同期API呼び出しなし）
 - [ ] 手動取得機能も引き続き利用可能
 - [ ] Actions 失敗時は GitHub UI でステータス確認できる
 - [ ] `make ci` でローカルでもCIチェックが可能（既存機能の維持）
+- [ ] pre-commit フックがローカル開発時に正常動作する（定期取得には影響しない）
 
 ---
 
