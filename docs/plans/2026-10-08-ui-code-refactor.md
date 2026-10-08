@@ -39,6 +39,34 @@
 - 変数を CSS カスタムプロパティと併用（`:root` の変数はそのまま、追加の内部変数を SCSS で定義）
 - 将来的に部分ファイル（`_variables.scss`, `_components.scss`）への分割が容易
 
+#### SCSS ファイル構成
+
+**初期構成（2ファイル）**:
+
+```
+scss/
+├── _variables.scss   # :root 変数（カラー、フォント、サイズ定数）
+└── style.scss        # メインスタイル（@import 'variables' + 全体）
+```
+
+**方針**:
+- 現在の規模（約170行）では2ファイルで十分
+- 変数だけ分離すれば、カラー調整時に見通しが良い
+- `style.scss` に全てのスタイルを記述（ネスト活用）
+
+**将来的な拡張基準**:
+- `style.scss` が **200行を超えたら** 4ファイル構成への移行を検討：
+  ```
+  scss/
+  ├── _variables.scss   # カラー、フォント、サイズ定数
+  ├── _base.scss        # リセット、body、基礎タイポグラフィ
+  ├── _components.scss  # フォーム、ボタン、フィード、テーブル
+  └── style.scss        # @import のみ
+  ```
+- さらに **500行を超えたら** レイヤー別分離（`_layout.scss`, `_typography.scss` など）を検討
+
+**判断はコードレビュー時に柔軟に**: 実装中にファイルが読みにくくなったら、その時点で分割する。
+
 ### 3. コンポーネント化（重複削除）
 
 **方針**: Jinja2 の `{% include %}` と `{% macro %}` を使い分ける
@@ -74,7 +102,8 @@
 src/my_feed/web/
 ├── static/
 │   ├── scss/
-│   │   └── style.scss          # SCSS ソース（Git 管理）
+│   │   ├── _variables.scss     # :root カラー変数（Git 管理）
+│   │   └── style.scss          # メインスタイル（Git 管理）
 │   └── css/
 │       └── style.css           # ビルド出力（Git 管理しない）
 ├── templates/
@@ -133,8 +162,10 @@ uv run my-feed serve
 3. `.gitignore` に `src/my_feed/web/static/css/` を追加
 
 ### Step 2: CSS 分離
-1. `src/my_feed/web/static/scss/style.scss` を作成
-2. `base.html` の `<style>` 内容を `style.scss` にコピー
+1. `src/my_feed/web/static/scss/_variables.scss` を作成（`:root` 変数を抽出）
+2. `src/my_feed/web/static/scss/style.scss` を作成
+   - `@import 'variables';` を追加
+   - `base.html` の `<style>` 内容から変数以外をコピー
 3. SCSS ビルドを実行して `style.css` を生成
 4. `app.py` に `StaticFiles` マウントを追加
 5. `base.html` の `<style>` を削除、`<link rel="stylesheet">` に変更
