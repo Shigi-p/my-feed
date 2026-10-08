@@ -1,0 +1,48 @@
+# pre-commit フック設定
+# インストール: uv run pre-commit install
+# 手動実行: uv run pre-commit run --all-files
+
+repos:
+  # Ruff - 高速なリンター・フォーマッター
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.16.10
+    hooks:
+      # リント実行
+      - id: ruff
+        args: [--fix]
+      # フォーマット実行
+      - id: ruff-format
+
+  # mypy - 型チェックは CI と make typecheck で実行
+  # pre-commit では全依存関係を additional_dependencies に追加する必要があり、
+  # 保守コストが高いため、ここでは実行しない
+
+  # 基本的なファイルチェック
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      # 末尾の空白削除
+      - id: trailing-whitespace
+        exclude: ^tests/snapshots/
+      # ファイル末尾に改行追加
+      - id: end-of-file-fixer
+        exclude: ^tests/snapshots/
+      # YAML構文チェック
+      - id: check-yaml
+      # TOML構文チェック
+      - id: check-toml
+      # JSON構文チェック
+      - id: check-json
+      # マージコンフリクトマーカー検出
+      - id: check-merge-conflict
+      # 巨大ファイルの検出（500KB以上）
+      - id: check-added-large-files
+        args: [--maxkb=500]
+
+  # コミットメッセージの形式チェック（オプション）
+  # Conventional Commits 形式を推奨
+  - repo: https://github.com/compilerla/conventional-pre-commit
+    rev: v3.6.0
+    hooks:
+      - id: conventional-pre-commit
+        stages: [commit-msg]

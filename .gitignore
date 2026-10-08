@@ -14,3 +14,9 @@ result.json
 out/
 config.local.toml
 .env
+
+# Coverage
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
