@@ -13,11 +13,11 @@
     <link>https://gigazine.net/</link>
     <description>日々のあらゆる雑談に役立つネタを提供するIT系ニュースサイト。起きている限りほぼ毎日更新中。</description>
     <dc:language>ja-JP</dc:language>
-    
+
     <dc:rights>Copyright 2026</dc:rights>
     <dc:date>2026-10-06T10:54:00+09:00</dc:date>
     <admin:generatorAgent rdf:resource="http://www.pmachine.com/" />
-    
+
 
     <item>
       <title>OpenAIがChatGPTのテキストに透かしを入れる取り組みを開始</title>

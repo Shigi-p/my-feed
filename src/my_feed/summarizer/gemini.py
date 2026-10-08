@@ -89,7 +89,7 @@ class GeminiSummarizer:
                     f"total={getattr(usage, 'total_token_count', '?')}"
                 )
 
-            return summary
+            return summary  # type: ignore[return-value]
 
         except Exception as exc:
             # Log the error but don't propagate — pipeline should continue

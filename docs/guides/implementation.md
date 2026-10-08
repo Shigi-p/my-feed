@@ -1,6 +1,6 @@
 # 実装ルール
 
-ステータス: **草案**  
+ステータス: **草案**
 対象: このリポジトリでコードを書くとき（エージェント・人）の具体的な規約
 
 関連: [collaboration.md](./collaboration.md)（全体方針）、[pr-review.md](./pr-review.md)（レビュー観点）
@@ -67,8 +67,8 @@ store/
 
 ### 3.2 よくある違反例
 
-❌ **表示層が永続化の仕事をする**  
-❌ **取得層がスコアリングをする**  
+❌ **表示層が永続化の仕事をする**
+❌ **取得層がスコアリングをする**
 ❌ **設定値が実行時に反映されない**
 
 ---
@@ -77,7 +77,7 @@ store/
 
 ### 4.1 生のいいね数での横断比較は禁止
 
-❌ **Zenn のいいね数と GitHub の star 数を直接比較しない**  
+❌ **Zenn のいいね数と GitHub の star 数を直接比較しない**
 ✅ **ソース内で正規化（minmax 等）してから横断ランキング**
 
 **理由**: スケールが違いすぎて不公平。
@@ -160,9 +160,11 @@ MY_FEED_LIVE=1 uv run pytest -m network
 # Import the module
 import foo
 
+
 # Define the function
 def bar():
     pass
+
 
 # Increment the counter
 counter += 1

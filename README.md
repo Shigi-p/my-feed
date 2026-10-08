@@ -4,7 +4,7 @@
 
 ## 現状
 
-**M2（ローカル完成）** まで到達。localhost で実取得 → Top 10 → Markdown DL → 履歴・お気に入り（SQLite）が使える。  
+**M2（ローカル完成）** まで到達。localhost で実取得 → Top 10 → Markdown DL → 履歴・お気に入り（SQLite）が使える。
 次は任意の **M3**（運用改善・フィルタ等）。
 
 ## セットアップ（uv）
@@ -18,6 +18,16 @@ uv sync --extra dev
 
 このプロジェクトでは自動化されたコード品質チェックを導入しています。
 
+### 初回セットアップ
+
+```bash
+# 依存関係をインストール
+make install
+
+# pre-commitフックをインストール（推奨）
+make pre-commit-install
+```
+
 ### クイックスタート
 
 ```bash
@@ -29,21 +39,47 @@ make lint         # Ruffリント
 make format       # 自動フォーマット
 make typecheck    # mypy型チェック
 make test         # テスト実行
+make test-cov     # カバレッジ付きテスト
 ```
 
 ### PRを出す前に
 
-1. コードをフォーマット: `make format`
-2. 全チェック実行: `make ci`
-3. 全て✓ならPRを作成
+**方法A: pre-commitを使う（推奨）**
+```bash
+git add .
+git commit -m "feat: 新機能を追加"
+# → 自動でリント・フォーマット・型チェックが実行される
+```
+
+**方法B: 手動チェック**
+```bash
+make format       # 1. コードをフォーマット
+make ci           # 2. 全チェック実行
+# 3. 全て✓ならPRを作成
+```
 
 ### ツール
 
 - **Ruff**: 高速なリンター・フォーマッター（行長110文字、日本語docstring対応）
 - **mypy**: 型チェッカー（段階的な厳格化方針）
 - **pytest**: テストランナー（ネットワークテストは `@pytest.mark.network` でマーク）
+- **pytest-cov**: カバレッジ測定（HTML/XML/ターミナル出力）
+- **pre-commit**: コミット前の自動チェック
 
-設定は `pyproject.toml` に集約されています。
+設定は `pyproject.toml` と `.pre-commit-config.yaml` に集約されています。
+
+### テストカバレッジ
+
+```bash
+# カバレッジ付きテスト実行
+make test-cov
+
+# HTMLレポートを確認
+open htmlcov/index.html  # macOS
+xdg-open htmlcov/index.html  # Linux
+```
+
+カバレッジレポートは PR の GitHub Actions でも自動生成され、Artifacts からダウンロード可能です。
 
 ## いちばん短い使い方（ローカル完成）
 
@@ -66,18 +102,18 @@ Gemini 3.5 Flash Lite を使った記事要約が利用可能です：
 1. **APIキーの取得**: [Google AI Studio](https://aistudio.google.com/apikey) で無料取得
 
 2. **環境変数の設定**（2つの方法）:
-   
+
    **方法A: .env ファイル（推奨）**
    ```bash
    cp .env.example .env
    # .env ファイルを編集してAPIキーを設定
    ```
-   
+
    `.env` の内容:
    ```
    GEMINI_API_KEY=your-api-key-here
    ```
-   
+
    **方法B: export コマンド**
    ```bash
    export GEMINI_API_KEY="your-api-key-here"
@@ -99,7 +135,7 @@ uv run my-feed serve --config config.local.toml --db data/my_feed.db
 uv run uvicorn my_feed.web.app:app --host 127.0.0.1 --port 8000
 ```
 
-「いま取得」→ Top 一覧 → Markdown DL → 履歴 / お気に入り。  
+「いま取得」→ Top 一覧 → Markdown DL → 履歴 / お気に入り。
 1 ソース失敗時は画面に `source_errors` を表示（`status=partial`）。
 
 ## M1: CLI 実ソース Top 10
@@ -138,15 +174,15 @@ uv run pytest
 
 ## Markdown → Gemini 壁打ち
 
-CLI の `--out-md` または Web の Markdown DL で bundle（AI要約・抜粋・なぜ今見るか・問い）を出す。  
+CLI の `--out-md` または Web の Markdown DL で bundle（AI要約・抜粋・なぜ今見るか・問い）を出す。
 Gemini / ChatGPT に貼り、「気になる番号で要約 → 反論 → 最小実験」と依頼する。
 
 M4-D 以降は AI 要約が自動生成されるため、手動での要約依頼は不要になります。
 
 ## 契約変更の手順
 
-1. **先に** 契約（`models` / `sources.base` / `scoring.base` / `output` / `store` / `pipeline`）を変える PR を出す  
-2. それをマージしてから、各トラック（T-Src 等）の実装 PR を追随させる  
+1. **先に** 契約（`models` / `sources.base` / `scoring.base` / `output` / `store` / `pipeline`）を変える PR を出す
+2. それをマージしてから、各トラック（T-Src 等）の実装 PR を追随させる
 3. トラック PR だけで契約を壊さない
 
 詳細: [docs/plans/tech-catchup/contracts/c0-contract-hub.md](./docs/plans/tech-catchup/contracts/c0-contract-hub.md)

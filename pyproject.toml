@@ -19,8 +19,10 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "pytest>=8.3.0",
+    "pytest-cov>=6.0.0",
     "ruff>=0.8.0",
     "mypy>=1.11.0",
+    "pre-commit>=4.0.0",
 ]
 
 [project.scripts]
@@ -42,6 +44,34 @@ pythonpath = ["src"]
 markers = [
     "network: hits live upstream APIs (opt-in via MY_FEED_LIVE=1)",
 ]
+addopts = [
+    "--cov=my_feed",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+    "--cov-report=xml",
+]
+
+[tool.coverage.run]
+source = ["src/my_feed"]
+omit = [
+    "*/tests/*",
+    "*/__pycache__/*",
+    "*/site-packages/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]
+precision = 2
+show_missing = true
 
 [tool.uv]
 package = true
@@ -80,5 +110,5 @@ disallow_untyped_defs = false
 check_untyped_defs = true
 
 [[tool.mypy.overrides]]
-module = ["feedparser", "google.genai"]
+module = ["feedparser", "google", "google.genai"]
 ignore_missing_imports = true
