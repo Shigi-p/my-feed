@@ -5,73 +5,99 @@
 | 日付 | 2026-10-08 |
 | 依存 | M2完了（Gemini要約が既に動作） |
 | 参考 | [ryochin/stingray](https://github.com/ryochin/stingray) |
-| ゴール | 自宅PCでollamaを使った要約が選択可能。出先ではGeminiを利用 |
+| ゴール | デフォルトはGemini。自宅PCでは環境変数でollamaに切り替え、コストゼロで要約できる |
+
+このPRは**計画のみ**。実装は承認後に別PRで進める。
 
 ---
 
-## 1. 背景・モチベーション
+## 1. 背景
 
-### 現状（M4-D完了時点）
-- Gemini 3.5 Flash Lite で要約が動作（1記事0.1円）
-- URL Contextで記事URLから直接取得・要約
-- コストは実用的だが、頻繁に使うと積み上がる
+### 現状
+- Gemini 3.5 Flash Lite + URL Context で Top N を要約（1記事約0.1円）
+- パイプラインはオンデマンド（「いま取得」）
+- 出先ではコードを触れない
 
-### 改善提案
-- **自宅PC利用時**: ollama（ローカルLLM）でコストゼロ運用
-- **出先**: Geminiにフォールバック（必要な時だけコスト発生）
+### 方針
+- **デフォルトは Gemini**（出先でそのまま動く）
+- **自宅PCだけ** `SUMMARIZER_BACKEND=ollama` で切り替え
+- ローカル実行を維持（常時稼働サーバーは作らない）
+- 自動フォールバックはしない（失敗時は要約スキップ）
 
-### 設計方針
-- デフォルトはGemini（出先でコードを触れないため）
-- 自宅PCでは環境変数 `SUMMARIZER_BACKEND=ollama` で切り替え
-- ローカル実行を維持（サーバー常時稼働は不要）
+### 使い方（完成後）
 
-### 参考実装
-stingray（RSSリーダー + ollama要約）から以下を参考：
-- 本文抽出ロジック（`content_snippet`）
-- Ollama API呼び出しパターン
-- 推奨モデル（`gemma4:e4b`）
+出先・通常:
+
+```bash
+export GEMINI_API_KEY="your-key"
+uv run my-feed serve
+```
+
+自宅PC:
+
+```bash
+ollama serve
+ollama pull gemma4:e4b
+SUMMARIZER_BACKEND=ollama uv run my-feed serve
+```
 
 ---
 
-## 2. 技術的な相違点と取り込む設計
+## 2. stingray との相違点
 
-### stingray vs my feed のアーキテクチャ差分
+| 観点 | stingray | my feed | 判断 |
+|------|----------|---------|------|
+| 実行モデル | 常時稼働 + cron | オンデマンド | **維持**。サーバー化しない |
+| 要約タイミング | 全記事を ingest 時に要約してDB保存 | Top N だけその場で要約 | **維持** |
+| 本文 | fetch時に全記事から `content_snippet` を抜く | 一覧API/RSSの `excerpt` のみ | **要約時に Top N だけ HTML 取得** |
+| LLM | ollama のみ | Gemini が既にある | **Gemini既定 + ollama任意** |
+| 並行 | asyncio + Semaphore(3) | 同期・順次 | **今回見送り** |
+| 永続化 | PostgreSQL に全記事 | SQLite は履歴・お気に入り | **維持** |
+| モデル | `gemma4:e4b` | — | **採用** |
 
-| 観点 | stingray | my feed | 取り込み |
-|------|----------|---------|---------|
-| **実行モデル** | サーバー常時稼働（cron） | オンデマンド実行 | 維持（変更なし） |
-| **要約タイミング** | fetch時→DB保存→表示 | fetch→score→Top N要約 | 維持（変更なし） |
-| **本文取得** | 事前抽出して`content_snippet`に保存 | Gemini URL Contextが自動取得 | **✅ 採用**（ollama用） |
-| **並行処理** | asyncio + Semaphore | 同期処理 | 🔄 将来検討 |
-| **永続化** | PostgreSQL | SQLite | 維持（変更なし） |
+取り込むもの:
 
-### 今回実装する設計
+- Ollama HTTP API（`/api/generate`、timeout、接続失敗はスキップ）
+- シンプルな HTML → 本文テキスト抽出
+- 推奨モデル `gemma4:e4b`
 
-#### ✅ A. 本文抽出（必須）
-- `Item.content_snippet: str` フィールド追加
-- 各Source adapterで本文を抽出（300-500文字）
-- ollama要約時にこれを使用（URL再取得不要）
+取り込まないもの:
 
-**実装場所**:
-- `models.py`: `Item` モデル拡張
-- `sources/content_extractor.py`: 本文抽出ユーティリティ（新規）
-- `sources/{zenn,qiita,gigazine}.py`: 本文抽出ロジック追加
+- cron / adaptive interval
+- 翻訳スイッチ
+- 全記事の事前本文抽出（Top N 以外を取る必要がない）
 
-**メリット**:
-- ollamaでURL再取得が不要
-- Geminiとの併用可能（Geminiは`content_snippet`を無視）
-- パフォーマンス向上
+---
 
-#### ✅ B. Backend切り替え（必須）
-- `summarizer.backend`: `"gemini"` | `"ollama"`（デフォルト: `"gemini"`）
-- 環境変数 `SUMMARIZER_BACKEND` で上書き可能
+## 3. 本文取得の判断（重要）
 
-**設定例**:
+stingrayは全記事を保存するので、fetch時に本文を抜くのが合理的。
+my feedは **スコア後の Top N（既定10件）だけ** 要約する。
+
+| 案 | 内容 | 欠点 |
+|----|------|------|
+| A. 各Sourceで全件HTML取得 | Zenn/Qiita等の一覧取得後に記事ページを全部取る | 一覧が数十件あるので遅い。Sourceの責任を超える |
+| B. `Item.content_snippet` を契約に追加 | C0変更が先に必要 | 今回の価値に対して重い |
+| **C. 要約時に Top N だけ取得** | `OllamaSummarizer` が URL を GET して本文抽出 | Gemini経路は今のまま。失敗時は `excerpt` / タイトルにフォールバック |
+
+**採用: C**
+
+- `Item` の契約は変えない
+- Gemini は URL Context のまま（本文取得しない）
+- ollama だけ自前で HTML を取る
+- 抽出は `sources/` ではなく `summarizer/` 側（要約のための取得）
+
+既存の `Item.excerpt` は RSS/API の短い抜粋。ollamaの入力が空ならこれを使い、それも無ければタイトルのみ。
+
+---
+
+## 4. 設定
+
 ```toml
 [summarizer]
 enabled = true
-backend = "gemini"  # デフォルト
-model = "gemini-3.5-flash-lite"
+backend = "gemini"                 # "gemini" | "ollama"
+model = "gemini-3.5-flash-lite"     # Gemini用（現状どおり）
 ollama_model = "gemma4:e4b"
 
 [summarizer.ollama]
@@ -79,227 +105,114 @@ base_url = "http://localhost:11434"
 timeout = 120
 ```
 
-**切り替え方法**:
-```bash
-# 自宅でollama利用
-SUMMARIZER_BACKEND=ollama uv run my-feed serve
+優先順位:
 
-# 出先でGemini（デフォルト）
-uv run my-feed serve
-```
+1. 環境変数 `SUMMARIZER_BACKEND`（`gemini` / `ollama`）
+2. `config` の `summarizer.backend`
+3. 未設定なら `gemini`
 
-#### 🔄 C. 並行処理（将来検討）
-- 現状: 順次実行（10記事×5秒=50秒）
-- 将来: asyncio + Semaphore（10記事→15秒程度）
-- 影響範囲が大きいため、今回は見送り
+`backend=ollama` で ollama に繋がらない場合は、Geminiへ落とさず警告して要約スキップ。
+出先でコードを触れない前提なので、デフォルトを Gemini にしておけば十分。
+
+技術パラメータ（temperature 等）は実装側の固定値。ユーザーが触るのは backend / model / URL / timeout だけ。
 
 ---
 
-## 3. 実装計画
+## 5. 実装ステップ（承認後のPR）
 
-### Phase 1: 本文抽出基盤（PR #1）
+契約（`Item` / `SummarizerAdapter`）は変えない。変わるのは設定と実装差し替え。
 
-**変更ファイル**:
-```
-src/my_feed/models.py
-src/my_feed/sources/content_extractor.py  # 新規
-tests/test_content_extractor.py           # 新規
-```
+### PR-1: 設定 + OllamaSummarizer + 本文抽出
 
-**実装内容**:
-1. `Item.content_snippet: str = ""` 追加
-2. `extract_content_snippet(html: str, max_chars: int = 500) -> str` 実装
-   - BeautifulSoup4で本文抽出
-   - script/style/nav除去
-   - シンプル実装（stingray参考）
-3. 単体テスト追加
+変更予定:
 
-**Exit Criteria**:
-- [ ] `Item.content_snippet` が追加されている
-- [ ] `extract_content_snippet` が動作する
-- [ ] テストが全てパスする
-- [ ] 既存機能に影響がない（後方互換性）
+- `src/my_feed/config.py` — `backend` / `OllamaConfig` / `get_backend()`
+- `config.example.toml` / `config.toml`（example側のみ enabled 例）
+- `src/my_feed/summarizer/html_text.py` — HTML → 本文（script/style/nav除去、上限500〜2000字）
+- `src/my_feed/summarizer/ollama.py` — GET本文 → ollama generate
+- `src/my_feed/summarizer/__init__.py`
+- `tests/test_summarizer.py` / `tests/test_html_text.py` / `tests/test_config.py`（あれば）
 
----
+`summarize(item)` の流れ:
 
-### Phase 2: Source adapter統合（PR #2）
+1. `get_text(item.url)`（既存 `http_util`）
+2. 本文抽出。失敗なら `item.excerpt`
+3. プロンプト（タイトル・タグ・本文）を ollama へ
+4. 失敗は例外を上げず `None`（既存 Protocol どおり）
 
-**変更ファイル**:
-```
-src/my_feed/sources/zenn.py
-src/my_feed/sources/qiita.py
-src/my_feed/sources/gigazine.py
-tests/test_sources_*.py
-```
+### PR-2: pipeline 分岐 + ドキュメント
 
-**実装内容**:
-1. 各adapterで本文HTMLを取得
-2. `extract_content_snippet` で抽出
-3. `Item.content_snippet` に設定
-4. fixturesベースのテスト更新
+変更予定:
 
-**Exit Criteria**:
-- [ ] Zenn/Qiita/Gigazineで`content_snippet`が抽出される
-- [ ] 既存のfetch処理に影響がない
-- [ ] テストが全てパスする
+- `src/my_feed/pipeline/run.py` — `get_backend()` で Gemini / Ollama を構築
+- `README.md` — デフォルトGemini、自宅は環境変数
+- `docs/notes/ollama-setup.md` — インストール、`gemma4:e4b`、接続失敗時の見方
+- `tests/test_summarizer_integration.py` — backend分岐（fake/mock）
+
+実 ollama 呼び出しは opt-in（例: `MY_FEED_OLLAMA=1`）。CIの通常テストはネットワーク無し。
 
 ---
 
-### Phase 3: Ollama Summarizer実装（PR #3）
+## 6. テスト
 
-**変更ファイル**:
-```
-src/my_feed/summarizer/ollama.py          # 新規
-src/my_feed/config.py
-config.example.toml
-tests/test_summarizer.py
-```
-
-**実装内容**:
-1. `OllamaSummarizer` クラス実装
-   - `content_snippet` を使用
-   - Ollama API (`/api/generate`) 呼び出し
-   - stingrayのプロンプトパターン参考
-2. `SummarizerConfig` 拡張
-   - `backend: Literal["gemini", "ollama"]`
-   - `ollama_model: str`
-   - `OllamaConfig` 追加
-3. config.example.toml更新
-4. fixturesベースのテスト
-
-**Exit Criteria**:
-- [ ] `OllamaSummarizer` が動作する
-- [ ] ollama接続失敗時は警告してスキップ
-- [ ] テストが全てパスする
+- HTML抽出: fixtures の HTML → テキスト
+- OllamaSummarizer: httpx を mock。本文GET成功/失敗、API成功/失敗
+- config: `backend` のデフォルトが `gemini`、環境変数が上書きする
+- pipeline: Geminiキー無しでも落ちない（現状維持）、ollama未起動でも落ちない
+- 回帰: 既存の Gemini / M1 / M2 テスト
 
 ---
 
-### Phase 4: Pipeline統合とドキュメント（PR #4）
+## 7. 見送り（今回やらない）
 
-**変更ファイル**:
-```
-src/my_feed/pipeline/run.py
-README.md
-docs/notes/sources.md  # ollama利用ガイド追加
-```
-
-**実装内容**:
-1. `_build_summarizer` を `backend` で分岐
-   - `backend="gemini"`: `GeminiSummarizer`
-   - `backend="ollama"`: `OllamaSummarizer`
-   - 環境変数 `SUMMARIZER_BACKEND` で上書き
-2. README更新
-   - ollamaセットアップ手順
-   - backend切り替え方法
-   - 推奨モデル（`gemma4:e4b`）
-3. 結合テスト
-
-**Exit Criteria**:
-- [ ] Gemini/Ollama両方が動作する
-- [ ] 環境変数で切り替え可能
-- [ ] ドキュメントが整備されている
-- [ ] 既存の全テストがパス
+| 項目 | 理由 |
+|------|------|
+| `Item.content_snippet` | C0変更。Top N 取得で足りる |
+| 各Sourceでの全文取得 | 遅い。層の責任を超える |
+| 自動 Gemini フォールバック | 意図せず課金したくない。デフォルトGeminiで足りる |
+| 並行要約 | Protocolを async にする必要がある |
+| 要約の永続化・再要約スキップ | Storeの契約拡張。別議論 |
+| 常時稼働サーバー / VPN | ローカル維持の判断済み |
 
 ---
 
-## 4. テスト戦略
-
-### 単体テスト
-- `extract_content_snippet`: HTML → テキスト抽出
-- `OllamaSummarizer`: mock使用（実際のollama不要）
-
-### 結合テスト
-- Gemini要約（既存）
-- Ollama要約（opt-in、`MY_FEED_OLLAMA=1`）
-- backend切り替え
-
-### 回帰テスト
-- 既存のfetch→score→要約フローに影響なし
-- Geminiのみ使う場合も問題なし
-
----
-
-## 5. 非機能要件
-
-### パフォーマンス
-- 現状: 順次実行（許容範囲内）
-- 将来: 並行処理で高速化（別PR）
-
-### エラーハンドリング
-- ollama接続失敗: 警告表示して要約スキップ
-- Gemini APIエラー: 既存と同様（ログ出力）
-
-### セキュリティ
-- ollama: localhost接続のみ（ローカル実行前提）
-- Gemini: APIキー管理は既存と同様
-
----
-
-## 6. ドキュメント更新
-
-### README.md
-```markdown
-### AI要約機能（デフォルト: Gemini）
-
-**出先・通常利用**:
-```bash
-export GEMINI_API_KEY="your-key"
-uv run my-feed serve
-```
-
-**自宅PCでコストゼロ運用**:
-```bash
-# ollama起動
-ollama serve &
-ollama pull gemma4:e4b
-
-# ollamaモードで起動
-SUMMARIZER_BACKEND=ollama uv run my-feed serve
-```
-```
-
-### docs/notes/ollama-setup.md（新規）
-- ollamaインストール手順
-- 推奨モデル（`gemma4:e4b`）
-- トラブルシューティング
-
----
-
-## 7. 判断ログ
+## 8. 判断ログ
 
 | 項目 | 判断 | 理由 |
 |------|------|------|
-| **デフォルトbackend** | Gemini | 出先でコードを触れないため |
-| **切り替え方法** | 環境変数 | 設定ファイル編集不要で柔軟 |
-| **並行処理** | 見送り | Protocol変更の影響範囲が大きい |
-| **自動フォールバック** | 見送り | 手動切り替えで十分 |
-| **推奨モデル** | gemma4:e4b | stingray実績あり、軽量 |
+| デフォルト backend | Gemini | 出先で設定を触れない |
+| 切り替え | 環境変数 `SUMMARIZER_BACKEND` | config編集より手元で切り替えやすい |
+| 本文取得 | 要約時・Top N のみ | 全件取得は過剰 |
+| 契約 | `Item` は変えない | 設定と summarizer 実装で閉じる |
+| モデル | gemma4:e4b | stingray実績、軽量 |
+| 失敗時 | スキップ | パイプラインを落とさない（既存方針） |
 
 ---
 
-## 8. リスクと対策
+## 9. リスク
 
-| リスク | 影響 | 対策 |
-|--------|------|------|
-| ollama未インストール | 要約失敗 | 明確なエラーメッセージ表示 |
-| 本文抽出失敗 | 要約品質低下 | 空の場合はタイトルのみで要約 |
-| Gemini品質低下 | 既存ユーザー影響 | 後方互換性を維持 |
-
----
-
-## 9. 完了条件
-
-- [ ] Phase 1-4 の全PR がマージされている
-- [ ] Gemini/Ollama両方が動作する
-- [ ] 環境変数で切り替え可能
-- [ ] ドキュメントが整備されている
-- [ ] 既存の全テストがパス
-- [ ] 新規テストがカバレッジを維持
+| リスク | 対策 |
+|--------|------|
+| ollama未起動 | 警告して要約スキップ。READMEに手順 |
+| 記事HTMLがJS依存で空 | `excerpt` / タイトルにフォールバック |
+| サイトがブロック | User-Agentは既存 `http_util` を使う。失敗は1件スキップ |
+| Gemini経路の劣化 | backend分岐以外は触らない |
 
 ---
 
-## 10. 参考リンク
+## 10. 完了条件（実装PR群）
 
-- [stingray リポジトリ](https://github.com/ryochin/stingray)
-- [Ollama 公式](https://ollama.com/)
-- [gemma4 モデル](https://ollama.com/library/gemma4)
+- [ ] `backend` 未指定時は今と同じ Gemini
+- [ ] `SUMMARIZER_BACKEND=ollama` で OllamaSummarizer が使われる
+- [ ] ollama未起動でもパイプラインは継続
+- [ ] 本文抽出と mock テストがある
+- [ ] README に自宅/出先の使い分けがある
+- [ ] `make ci` 相当が通る
+
+---
+
+## 11. 参考
+
+- [stingray](https://github.com/ryochin/stingray) — `backend/summarizer.py`, `backend/fetcher.py`, `backend/llm.py`
+- [Ollama](https://ollama.com/)
+- [gemma4](https://ollama.com/library/gemma4)
