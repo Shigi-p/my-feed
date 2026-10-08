@@ -35,4 +35,4 @@ def recency_factor(
     age_hours = max(0.0, age_seconds / 3600.0)
     if half_life_hours <= 0:
         return 0.0 if age_hours > 0 else 1.0
-    return 0.5 ** (age_hours / half_life_hours)
+    return float(0.5 ** (age_hours / half_life_hours))

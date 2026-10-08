@@ -14,6 +14,37 @@
 uv sync --extra dev
 ```
 
+## 開発者向け：コード品質チェック
+
+このプロジェクトでは自動化されたコード品質チェックを導入しています。
+
+### クイックスタート
+
+```bash
+# CI相当の全チェックを実行
+make ci
+
+# 個別実行
+make lint         # Ruffリント
+make format       # 自動フォーマット
+make typecheck    # mypy型チェック
+make test         # テスト実行
+```
+
+### PRを出す前に
+
+1. コードをフォーマット: `make format`
+2. 全チェック実行: `make ci`
+3. 全て✓ならPRを作成
+
+### ツール
+
+- **Ruff**: 高速なリンター・フォーマッター（行長110文字、日本語docstring対応）
+- **mypy**: 型チェッカー（段階的な厳格化方針）
+- **pytest**: テストランナー（ネットワークテストは `@pytest.mark.network` でマーク）
+
+設定は `pyproject.toml` に集約されています。
+
 ## いちばん短い使い方（ローカル完成）
 
 ```bash

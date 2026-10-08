@@ -62,9 +62,7 @@ def test_extract_popularity_prefers_stars_today_over_stars():
 
 
 def test_normalize_minmax_maps_within_cohort():
-    assert normalize_values([10.0, 20.0, 30.0], method="minmax") == pytest.approx(
-        [0.0, 0.5, 1.0]
-    )
+    assert normalize_values([10.0, 20.0, 30.0], method="minmax") == pytest.approx([0.0, 0.5, 1.0])
 
 
 def test_normalize_minmax_equal_and_missing():
@@ -76,9 +74,7 @@ def test_normalize_minmax_equal_and_missing():
 
 def test_normalize_rank():
     # values 10, 30, 20 → ranks 0, 2, 1 → 0, 1, 0.5
-    assert normalize_values([10.0, 30.0, 20.0], method="rank") == pytest.approx(
-        [0.0, 1.0, 0.5]
-    )
+    assert normalize_values([10.0, 30.0, 20.0], method="rank") == pytest.approx([0.0, 1.0, 0.5])
 
 
 def test_normalize_popularity_by_source_is_independent():
@@ -209,9 +205,7 @@ def test_hybrid_combines_popularity_and_recency():
     by_id = {s.item.id: s for s in scored}
     # stale: pop=1.0 * 0.25 = 0.25; fresh-mid: pop=0.5 * ~0.98 ≈ 0.49
     assert by_id["zenn:fresh-mid"].score > by_id["zenn:stale-hit"].score
-    assert by_id["gigazine:fresh"].score_breakdown["norm_popularity"] == pytest.approx(
-        0.5
-    )
+    assert by_id["gigazine:fresh"].score_breakdown["norm_popularity"] == pytest.approx(0.5)
     assert scored == sorted(scored, key=lambda s: (-s.score, s.item.id))
 
 

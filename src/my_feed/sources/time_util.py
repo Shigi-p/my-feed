@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
+from calendar import timegm
 from datetime import UTC, datetime
 from email.utils import parsedate_to_datetime
 from time import struct_time
-from calendar import timegm
 
 
 def parse_datetime(value: object) -> datetime | None:

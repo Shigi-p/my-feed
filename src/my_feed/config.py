@@ -33,7 +33,7 @@ class ScoringConfig(BaseModel):
 
 class SummarizerConfig(BaseModel):
     """AI summarization settings (M4-D).
-    
+
     Technical parameters (temperature, max_output_tokens, thinking_level) are
     hardcoded in the implementation. Users only need to toggle enabled and
     optionally choose a different model.

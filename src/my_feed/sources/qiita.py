@@ -10,8 +10,9 @@ from __future__ import annotations
 import json
 import logging
 import re
+from collections.abc import Callable
 from datetime import UTC, datetime
-from typing import Any, Callable
+from typing import Any
 
 from my_feed.ids import make_item_id
 from my_feed.models import Item, SourceName

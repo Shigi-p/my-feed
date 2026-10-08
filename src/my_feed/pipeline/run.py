@@ -9,7 +9,7 @@ from my_feed.config import AppConfig
 from my_feed.models import PipelineResult, PipelineStatus, ScoredItem
 from my_feed.scoring import build_scorer
 from my_feed.sources import get_source
-from my_feed.summarizer import FakeSummarizer, GeminiSummarizer, SummarizerAdapter
+from my_feed.summarizer import GeminiSummarizer, SummarizerAdapter
 
 logger = logging.getLogger(__name__)
 

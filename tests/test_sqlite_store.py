@@ -32,23 +32,18 @@ def db_path(tmp_path: Path) -> Path:
 
 @pytest.fixture
 def sample_result():
-    return run_pipeline(
-        AppConfig(top_n=3, default_scorer="fake", enabled_sources=[SourceName.FAKE])
-    )
+    return run_pipeline(AppConfig(top_n=3, default_scorer="fake", enabled_sources=[SourceName.FAKE]))
 
 
 def test_default_db_path():
-    assert DEFAULT_DB_PATH == Path("data/my_feed.db")
+    assert Path("data/my_feed.db") == DEFAULT_DB_PATH
 
 
 def test_schema_creates_tables(db_path: Path):
     conn = connect(db_path)
     ensure_schema(conn)
     tables = {
-        row[0]
-        for row in conn.execute(
-            "SELECT name FROM sqlite_master WHERE type = 'table'"
-        ).fetchall()
+        row[0] for row in conn.execute("SELECT name FROM sqlite_master WHERE type = 'table'").fetchall()
     }
     assert "runs" in tables
     assert "favorites" in tables
@@ -61,9 +56,7 @@ def test_sqlite_stores_satisfy_protocols(db_path: Path):
     assert isinstance(favs, FavoriteStore)
 
 
-def test_run_store_crud_persists_across_connections(
-    db_path: Path, sample_result
-) -> None:
+def test_run_store_crud_persists_across_connections(db_path: Path, sample_result) -> None:
     store = create_sqlite_run_store(db_path)
     run_id = store.save_run(sample_result)
     assert store.get_run(run_id) == sample_result
@@ -82,12 +75,8 @@ def test_run_store_crud_persists_across_connections(
 
 def test_list_runs_newest_first(db_path: Path, sample_result) -> None:
     store = create_sqlite_run_store(db_path)
-    older = sample_result.model_copy(
-        update={"fetched_at": datetime(2020, 1, 1, tzinfo=UTC)}
-    )
-    newer = sample_result.model_copy(
-        update={"fetched_at": datetime(2024, 6, 1, tzinfo=UTC)}
-    )
+    older = sample_result.model_copy(update={"fetched_at": datetime(2020, 1, 1, tzinfo=UTC)})
+    newer = sample_result.model_copy(update={"fetched_at": datetime(2024, 6, 1, tzinfo=UTC)})
     id_old = store.save_run(older)
     id_new = store.save_run(newer)
     assert store.list_runs() == [id_new, id_old]

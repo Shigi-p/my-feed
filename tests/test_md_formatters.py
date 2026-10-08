@@ -10,16 +10,16 @@ from my_feed.output.formatters import brainstorm_prompts, format_excerpt, strip_
 
 def _item(**kwargs) -> Item:
     now = datetime(2026, 10, 6, 3, 0, tzinfo=UTC)
-    base = dict(
-        id="zenn:1",
-        source=SourceName.ZENN,
-        title="Rust で書く小さな CLI",
-        url="https://example.com/a",
-        published_at=now - timedelta(hours=5),
-        excerpt="本文抜粋",
-        tags=["rust", "cli"],
-        fetched_at=now,
-    )
+    base = {
+        "id": "zenn:1",
+        "source": SourceName.ZENN,
+        "title": "Rust で書く小さな CLI",
+        "url": "https://example.com/a",
+        "published_at": now - timedelta(hours=5),
+        "excerpt": "本文抜粋",
+        "tags": ["rust", "cli"],
+        "fetched_at": now,
+    }
     base.update(kwargs)
     return Item(**base)
 

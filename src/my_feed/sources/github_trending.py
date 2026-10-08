@@ -14,8 +14,8 @@ from __future__ import annotations
 
 import logging
 import re
+from collections.abc import Callable
 from datetime import UTC, datetime
-from typing import Callable
 
 from my_feed.ids import make_item_id
 from my_feed.models import Item, SourceName
@@ -30,7 +30,7 @@ _HREF_RE = re.compile(r'<h2[^>]*>.*?href="(/[^"/]+/[^"/]+)"', re.S)
 _STARS_RE = re.compile(r'href="(/[^"/]+/[^"/]+/stargazers)"[^>]*>\s*(.*?)\s*</a>', re.S)
 _FORKS_RE = re.compile(r'href="(/[^"/]+/[^"/]+/forks)"[^>]*>\s*(.*?)\s*</a>', re.S)
 _TODAY_RE = re.compile(
-    r'([\d,]+)\s+stars?\s+today',
+    r"([\d,]+)\s+stars?\s+today",
     re.I,
 )
 _LANG_RE = re.compile(r'itemprop="programmingLanguage"[^>]*>\s*([^<]+)')
@@ -66,10 +66,7 @@ class GitHubTrendingSourceAdapter:
         text = self._fetcher(
             self._url,
             headers={
-                "User-Agent": (
-                    "Mozilla/5.0 (compatible; my-feed/0.1; "
-                    "+https://github.com/shigi-p/my-feed)"
-                ),
+                "User-Agent": ("Mozilla/5.0 (compatible; my-feed/0.1; +https://github.com/shigi-p/my-feed)"),
                 "Accept": "text/html,application/xhtml+xml",
             },
         )

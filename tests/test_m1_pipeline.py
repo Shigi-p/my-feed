@@ -99,15 +99,11 @@ def test_m1_pipeline_top_n_with_hybrid(restore_real_sources):
 def test_m1_pipeline_scorer_switch(restore_real_sources):
     register_source(_FixedAdapter(SourceName.ZENN, [_item(SourceName.ZENN, 1, likes=10)]))
 
-    hybrid = run_pipeline(
-        AppConfig(top_n=1, default_scorer="hybrid", enabled_sources=[SourceName.ZENN])
-    )
+    hybrid = run_pipeline(AppConfig(top_n=1, default_scorer="hybrid", enabled_sources=[SourceName.ZENN]))
     popularity = run_pipeline(
         AppConfig(top_n=1, default_scorer="popularity", enabled_sources=[SourceName.ZENN])
     )
-    recency = run_pipeline(
-        AppConfig(top_n=1, default_scorer="recency", enabled_sources=[SourceName.ZENN])
-    )
+    recency = run_pipeline(AppConfig(top_n=1, default_scorer="recency", enabled_sources=[SourceName.ZENN]))
 
     assert hybrid.scorer == "hybrid"
     assert popularity.scorer == "popularity"

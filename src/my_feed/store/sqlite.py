@@ -106,9 +106,7 @@ class SQLiteRunStore:
         return PipelineResult.model_validate_json(row["result_json"])
 
     def list_runs(self) -> list[str]:
-        rows = self._conn.execute(
-            "SELECT id FROM runs ORDER BY created_at DESC, rowid DESC"
-        ).fetchall()
+        rows = self._conn.execute("SELECT id FROM runs ORDER BY created_at DESC, rowid DESC").fetchall()
         return [row["id"] for row in rows]
 
 
@@ -125,7 +123,7 @@ class SQLiteFavoriteStore:
         ).fetchone()
         item_json = item.model_dump_json()
         if existing is not None:
-            fav_id = existing["id"]
+            fav_id = str(existing["id"])
             self._conn.execute(
                 """
                 UPDATE favorites
