@@ -108,8 +108,7 @@ jobs:
   - type-check (mypy)
   - test (pytest with coverage, network tests 除外)
     - カバレッジ測定（pytest-cov）
-    - Codecov へアップロード（PR 時）
-    - HTML レポートを Artifact として保存（30日間）
+    - HTML レポートを Artifact として保存（30日間、ローカル完結）
 ```
 
 **目的**: コード品質保証（PR レビュー時 + main マージ時）
@@ -142,7 +141,7 @@ jobs:
 | **トリガー** | PR + main への push | cron (1日1回) + 手動 |
 | **目的** | コード品質チェック | データ更新 |
 | **git 操作** | なし（read-only） | commit & push (`[skip ci]`) |
-| **Secrets** | `CODECOV_TOKEN`（オプション） | `GEMINI_API_KEY`（必須） |
+| **Secrets** | なし | `GEMINI_API_KEY`（必須） |
 | **実行時間** | 〜2-3分（カバレッジ含む） | 〜5分（API呼び出し含む） |
 | **Artifact** | coverage HTML レポート（30日） | なし |
 
