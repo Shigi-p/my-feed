@@ -2,7 +2,7 @@
 
 このリポジトリでエージェント（や人）と進めるときの基本姿勢と、情報の入口。
 
-今の位置・使い方: [README.md](./README.md)
+使い方: [README.md](./README.md)
 未着手: [GitHub Issues](https://github.com/Shigi-p/my-feed/issues)
 
 ---

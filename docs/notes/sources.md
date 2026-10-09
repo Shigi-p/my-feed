@@ -26,7 +26,7 @@ cp config.example.toml config.local.toml
 uv run my-feed run --config config.local.toml
 ```
 
-同じキーをローカル上書きに書いてもよい。手順は README「M1: CLI 実ソース Top 10」。
+同じキーをローカル上書きに書いてもよい。手順は README の CLI 節。
 
 ## ライブ確認（任意）
 
