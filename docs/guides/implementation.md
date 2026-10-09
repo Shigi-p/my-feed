@@ -3,7 +3,7 @@
 ステータス: **草案**
 対象: このリポジトリでコードを書くとき（エージェント・人）の具体的な規約
 
-関連: [collaboration.md](./collaboration.md)（全体方針）、[pr-review.md](./pr-review.md)（レビュー観点）
+関連: [collaboration.md](./collaboration.md)（全体方針）、[pr-review.md](./pr-review.md)（レビュー観点）、[reading-order.md](./reading-order.md)（コードを理解するときの読み順）
 
 ---
 
@@ -109,6 +109,7 @@ store/
 1. 先に契約（`models` / `sources.base` / `scoring.base` / `output` / `store` / `pipeline`）を変える PR を出す
 2. それをマージしてから、各トラック（T-Src 等）の実装 PR を追随させる
 3. トラック PR だけで契約を壊さない
+4. 層の増減や Protocol の入出力が変わったら、[reading-order.md](./reading-order.md) の「次のファイル」がまだ正しいかを見る
 
 詳細: [docs/plans/tech-catchup/contracts/c0-contract-hub.md](../plans/tech-catchup/contracts/c0-contract-hub.md)
 
@@ -214,3 +215,4 @@ counter += 1
 | 日付 | 内容 |
 |------|------|
 | 2026-10-07 | 初版作成。AGENTS.md から実装ルールを分離 |
+| 2026-10-09 | 契約変更時に reading-order.md の矢印を確認する手順を追加 |
