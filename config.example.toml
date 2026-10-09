@@ -11,11 +11,8 @@ recency_half_life_hours = 36
 neutral_popularity_when_missing = 0.5
 
 # AI Summarization (M4-D Gemini / M4-H Ollama).
-# Default backend is Gemini. For local Ollama (after PR-2 wiring):
-#   ollama serve && ollama pull gemma4:e4b
-#   SUMMARIZER_BACKEND=ollama uv run my-feed serve
-# Set GEMINI_API_KEY when using Gemini:
-#   export GEMINI_API_KEY="your-api-key-here"
+# Default backend is Gemini. SUMMARIZER_BACKEND env overrides config.
+# Set GEMINI_API_KEY when using Gemini.
 # Technical parameters are hardcoded in the implementation.
 [summarizer]
 enabled = true
