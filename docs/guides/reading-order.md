@@ -1,9 +1,6 @@
 # コードの読み順
 
-ステータス: **草案**
 対象: このリポジトリの処理の流れを、コードから理解したい人（とエージェント）
-
-関連: [implementation.md](./implementation.md)（書くときのルール）、[c0-contract-hub.md](../plans/tech-catchup/contracts/c0-contract-hub.md)（契約の形）、[sources.md](../notes/sources.md)（取得手段の理由）
 
 ---
 
@@ -133,11 +130,3 @@ Web は pipeline を再実装しない。`create_run` が `run_pipeline` → `sa
 - 型に現れない約束が変わった（例: 欠損値の扱い、ID の意味）
 
 契約（Protocol / `models`）を変える PR では、読み順の矢印がまだ正しいかを見る。手順は [implementation.md §5](./implementation.md#5-契約変更のルール)。
-
----
-
-## 変更履歴
-
-| 日付 | 内容 |
-|------|------|
-| 2026-10-09 | 初版。図や型表ではなく、コードを見る順番と注目点を固定する |

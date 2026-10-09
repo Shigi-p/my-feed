@@ -1,40 +1,39 @@
-# Source adapters (T-Src)
+# ソースアダプタ
 
-Short notes on fetch paths chosen for each `SourceAdapter`. Default
-`config.toml` still enables only `fake` so local runs stay offline-safe.
+各 `SourceAdapter` の取得経路メモ。ルートの `config.toml` はオフライン安全のため `fake` のみ。
 
-## Endpoints
+## エンドポイント
 
-| Source | Method | URL / notes |
-|--------|--------|-------------|
-| **Zenn** | Public JSON API | `GET https://zenn.dev/api/articles?order=daily&page=1` — unofficial but used by the Zenn web app; includes `liked_count` / `bookmarked_count`. RSS (`https://zenn.dev/feed`) is available but omits likes, so API is preferred. |
-| **Qiita** | Official API v2 | `GET https://qiita.com/api/v2/items?page=1&per_page=20` — public GET needs **no token**. Returns `likes_count` / `stocks_count`. Unauthenticated rate limits are tighter; token optional later. RSS exists (`/popular-items/feed`) but lacks stock/like metrics. |
-| **GIGAZINE** | Official RSS 2.0 | `GET https://gigazine.net/news/rss_2.0/` — no metrics. **No filtering** in the adapter (topic filters belong to M3). |
-| **GitHub Trending** | HTML scrape (isolated) | `GET https://github.com/trending` — no official API. Parser lives in `github_trending.py` only; failures raise and the pipeline records `source_errors` without aborting other sources. Metrics: `stars`, `forks`, `stars_today` when present in markup. |
+| ソース | 手段 | URL / メモ |
+|--------|------|------------|
+| **Zenn** | 非公式の公開 JSON API | `GET https://zenn.dev/api/articles?order=daily&page=1` — Zenn の Web が使う API。`liked_count` / `bookmarked_count` がある。RSS（`https://zenn.dev/feed`）は likes が無いので API を優先。 |
+| **Qiita** | 公式 API v2 | `GET https://qiita.com/api/v2/items?page=1&per_page=20` — 公開 GET にトークン不要。`likes_count` / `stocks_count` を返す。未認証はレート制限が厳しい。トークンは後から任意。RSS（`/popular-items/feed`）は stock/like が無い。 |
+| **GIGAZINE** | 公式 RSS 2.0 | `GET https://gigazine.net/news/rss_2.0/` — 指標なし。アダプタ内ではフィルタしない（トピックフィルタは運用改善の Issue）。 |
+| **GitHub Trending** | HTML スクレイピング（隔離） | `GET https://github.com/trending` — 公式 API なし。パーサは `github_trending.py` のみ。失敗は raise し、pipeline が `source_errors` に残して他ソースは続ける。取れるとき: `stars` / `forks` / `stars_today`。 |
 
-## Error policy
+## 失敗時
 
-- Whole-source transport / fatal parse → raise (`RuntimeError`); pipeline catches.
-- Single entry parse failure → skip that entry (warning log).
-- Genuine empty result → `[]`.
+- ソース全体の通信失敗・致命的なパース失敗 → raise（`RuntimeError`）。pipeline が捕捉する。
+- 1件のパース失敗 → その件だけスキップ（warning ログ）。
+- 本当に空 → `[]`。
 
-## Enabling real sources
+## 実ソースを有効にする
 
-Prefer the checked-in example (keeps root `config.toml` offline-safe):
+コミット済みの example をコピーする（ルート `config.toml` は fake のまま）:
 
 ```bash
 cp config.example.toml config.local.toml
 uv run my-feed run --config config.local.toml
 ```
 
-Or paste the same keys into a local override. Details: README「M1: 実ソースで CLI Top 10」。
+同じキーをローカル上書きに書いてもよい。手順は README の CLI 節。
 
-## Live smoke (optional)
+## ライブ確認（任意）
 
-CI / default pytest use fixtures only (no network). To hit live endpoints:
+CI と通常の pytest は fixtures のみ（ネットワークなし）。実際のエンドポイントを叩くとき:
 
 ```bash
 MY_FEED_LIVE=1 uv run pytest -m network
-# M1 end-to-end only:
+# M1 の結合だけ:
 MY_FEED_LIVE=1 uv run pytest -m network tests/test_m1_pipeline.py
 ```
