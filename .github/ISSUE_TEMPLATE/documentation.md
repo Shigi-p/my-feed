@@ -12,7 +12,7 @@ assignees: ''
 <!-- 改善したいドキュメント -->
 - [ ] README.md
 - [ ] docs/guides/
-- [ ] docs/plans/
+- [ ] docs/notes/
 - [ ] コード内のdocstring
 - [ ] その他: 
 

@@ -3,7 +3,7 @@
 ステータス: **草案**。並行トラック PR（T-Src / T-Score / T-Md / T-Web / T-Store）の事前レビューで出た論点を一般化したもの。
 具体バグ票ではなく、次回以降も使えるチェックの型として育てる。
 
-関連: [届け方モデル](../plans/tech-catchup/delivery-model.md)（契約ハブ + 並行トラック）
+関連: [implementation.md](./implementation.md)（契約変更の手続き）
 
 ---
 
@@ -182,16 +182,16 @@ my-feed（契約ハブ + 並行トラック）で特に効く型。
 
 ### 3.1 契約ハブを壊していないか
 
-- C0 のモデル / Protocol の意味を、トラック PR が静かに変えていないか
-- 変える必要があるなら **契約変更を先出し**できているか（delivery-model のルール）
-- Fake 実装を残す／消す判断が、マイルストーン（M1/M2）の意図と合うか
+- `models.py` / 各 `base.py` の意味を、機能 PR が静かに変えていないか
+- 変える必要があるなら **契約変更を先出し**できているか
+- Fake 実装を残す／消す判断が、その変更の意図と合うか
 
 ### 3.1.1 ファイル命名（`base.py`）
 
 - 各パッケージの **`base.py` は Protocol / 契約のみ**（`sources` / `scoring` と同型）
 - 実装は役割名のファイルへ置く（例: `output/markdown.py`, `store/memory.py`, `store/sqlite.py`, `sources/zenn.py`）
 - スタブを `base.py` に同居させると、後続トラックが実装をそこに足してしまいやすい
-- **本 PR で C0 側も修正済み**: `output` / `store` の実装を `markdown.py` / `memory.py` へ分離。トラック PR はこれを `main` に取り込んでからレビュー・リベースする想定
+- `output` / `store` の実装は `markdown.py` / `memory.py` など役割名のファイルへ。`base.py` に戻さない
 
 ### 3.2 トラック単体完了 ≠ プロダクト完成
 

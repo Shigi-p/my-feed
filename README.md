@@ -4,8 +4,8 @@
 
 ## 現状
 
-**M2（ローカル完成）** まで到達。localhost で実取得 → Top 10 → Markdown DL → 履歴・お気に入り（SQLite）が使える。
-次は任意の **M3**（運用改善・フィルタ等）。
+**M2（ローカル完成）+ M4-D（Gemini 要約）**。localhost で実取得 → Top 10 → Markdown DL → 履歴・お気に入り（SQLite）が使える。
+次は任意。未着手は [GitHub Issues](https://github.com/Shigi-p/my-feed/issues)。
 
 ## 注意
 
@@ -192,16 +192,17 @@ M4-D 以降は AI 要約が自動生成されるため、手動での要約依�
 
 ## 契約変更の手順
 
-1. **先に** 契約（`models` / `sources.base` / `scoring.base` / `output` / `store` / `pipeline`）を変える PR を出す
-2. それをマージしてから、各トラック（T-Src 等）の実装 PR を追随させる
-3. トラック PR だけで契約を壊さない
+型の正本はコード（`models.py` / 各 `base.py`）。
 
-詳細: [docs/plans/tech-catchup/contracts/c0-contract-hub.md](./docs/plans/tech-catchup/contracts/c0-contract-hub.md)
+1. **先に** 契約（`models` / `sources.base` / `scoring.base` / `output` / `store` / `pipeline` / `summarizer.base`）を変える PR を出す
+2. それをマージしてから、実装 PR を追随させる
+3. 機能 PR だけで契約を壊さない
 
-## 計画ドキュメント
+詳細: [docs/guides/implementation.md](./docs/guides/implementation.md)
 
-- [docs/plans/tech-catchup/README.md](./docs/plans/tech-catchup/README.md)
-- 届け方: [契約ハブ + 並行トラック](./docs/plans/tech-catchup/delivery-model.md)
+## ドキュメント
+
+- 未着手: [GitHub Issues](https://github.com/Shigi-p/my-feed/issues)
 - レビュー観点: [docs/guides/pr-review.md](./docs/guides/pr-review.md)
 - 協働方針: [docs/guides/collaboration.md](./docs/guides/collaboration.md)
 - コードの読み順: [docs/guides/reading-order.md](./docs/guides/reading-order.md)

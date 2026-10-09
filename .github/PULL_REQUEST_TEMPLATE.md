@@ -38,7 +38,7 @@
 
 <!-- 関連するIssue番号や計画ドキュメントへのリンク -->
 <!-- 例: Closes #123 -->
-<!-- 例: 計画: docs/plans/tech-catchup/milestones/m3-ops.md -->
+<!-- 例: Closes #23 -->
 
 ## 備考
 

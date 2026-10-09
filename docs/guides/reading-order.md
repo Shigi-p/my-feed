@@ -3,7 +3,7 @@
 ステータス: **草案**
 対象: このリポジトリの処理の流れを、コードから理解したい人（とエージェント）
 
-関連: [implementation.md](./implementation.md)（書くときのルール）、[c0-contract-hub.md](../plans/tech-catchup/contracts/c0-contract-hub.md)（契約の形）、[sources.md](../notes/sources.md)（取得手段の理由）
+関連: [implementation.md](./implementation.md)（書くときのルール）、[`models.py`](../../src/my_feed/models.py)（型の正本）、[sources.md](../notes/sources.md)（取得手段の理由）
 
 ---
 

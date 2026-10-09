@@ -1,6 +1,6 @@
 # guides
 
-運用・レビューなど、実装トラック以外の短いガイド。
+方針・禁止事項など、あまり動かないガイド。今の使い方は [README](../../README.md)。未着手は [Issues](https://github.com/Shigi-p/my-feed/issues)。
 
 | ファイル | 内容 |
 |----------|------|
