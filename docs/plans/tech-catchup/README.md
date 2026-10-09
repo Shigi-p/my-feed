@@ -22,6 +22,7 @@
 |-------------------------|------|
 | [APPROVAL.md](./APPROVAL.md) | 計画 PR の承認チェックリスト |
 | [2026-10-06-roadmap.md](./2026-10-06-roadmap.md) | 初回ロードマップ（要件・アーキテクチャ） |
+| [2026-10-08-m4d-ollama-integration.md](./2026-10-08-m4d-ollama-integration.md) | M4-D拡張: Gemini既定 + 自宅でOllama切替（計画） |
 | [delivery-model.md](./delivery-model.md) | 契約ハブ + 並行トラックの説明 |
 | [contracts/](./contracts/README.md) | C0 契約ハブ詳細 |
 | [tracks/](./tracks/README.md) | T-Src / T-Score / T-Md / T-Web / T-Store |
