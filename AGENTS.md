@@ -26,7 +26,7 @@
 
 | 知りたいこと | 参照先 |
 |------------|--------|
-| 今の位置・使い方 | [README.md](./README.md) |
+| 使い方 | [README.md](./README.md) |
 | 未着手の仕事 | [GitHub Issues](https://github.com/Shigi-p/my-feed/issues) |
 | 実装ルール | [docs/guides/implementation.md](./docs/guides/implementation.md) |
 | コードの読み順 | [docs/guides/reading-order.md](./docs/guides/reading-order.md) |
