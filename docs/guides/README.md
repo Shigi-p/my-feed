@@ -1,6 +1,6 @@
 # guides
 
-方針・禁止事項など、あまり動かないガイド。今の使い方は [README](../../README.md)。未着手は [Issues](https://github.com/Shigi-p/my-feed/issues)。
+方針・禁止事項など、あまり動かないガイド。
 
 | ファイル | 内容 |
 |----------|------|
