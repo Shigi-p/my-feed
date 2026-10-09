@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "macros.html" import action_buttons %}
 {% block title %}お気に入り · my feed{% endblock %}
 {% block content %}
 <h1>お気に入り</h1>
@@ -13,12 +14,11 @@
       <a class="title" href="{{ item.url }}" target="_blank" rel="noopener">{{ item.title }}</a>
       <div class="meta">{{ item.source.value }} · {{ fav_id }}</div>
     </div>
-    <div class="actions">
-      <form method="post" action="/favorites/{{ fav_id }}/delete">
-        <input type="hidden" name="next" value="/favorites">
-        <button type="submit" class="ghost">解除</button>
-      </form>
-    </div>
+    {{ action_buttons(
+      next_url="/favorites",
+      favorite_id=fav_id,
+      remove_label="解除"
+    ) }}
   </li>
   {% endfor %}
 </ol>

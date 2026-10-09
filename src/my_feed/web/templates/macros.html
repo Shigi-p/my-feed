@@ -1,0 +1,29 @@
+{# Repeated action controls (favorite add/remove, optional Markdown download). #}
+{% macro action_buttons(
+  next_url,
+  favorite_id=none,
+  run_id=none,
+  item_id=none,
+  show_markdown=false,
+  add_label="お気に入り",
+  remove_label="お気に入り解除"
+) %}
+<div class="actions">
+  {% if favorite_id %}
+  <form method="post" action="/favorites/{{ favorite_id }}/delete">
+    <input type="hidden" name="next" value="{{ next_url }}">
+    <button type="submit" class="ghost">{{ remove_label }}</button>
+  </form>
+  {% elif run_id and item_id %}
+  <form method="post" action="/favorites">
+    <input type="hidden" name="run_id" value="{{ run_id }}">
+    <input type="hidden" name="item_id" value="{{ item_id }}">
+    <input type="hidden" name="next" value="{{ next_url }}">
+    <button type="submit" class="ghost">{{ add_label }}</button>
+  </form>
+  {% endif %}
+  {% if show_markdown and run_id and item_id %}
+  <a class="btn ghost" href="/runs/{{ run_id }}/items/{{ item_id|path_quote }}/markdown">MD</a>
+  {% endif %}
+</div>
+{% endmacro %}

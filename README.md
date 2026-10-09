@@ -18,6 +18,7 @@ uv sync --extra dev
 ```bash
 cp config.example.toml config.local.toml   # 初回のみ（実ソース + hybrid + AI要約）
 cp .env.example .env                       # 要約を使う場合。GEMINI_API_KEY を入れる
+uv run sassquatch src/my_feed/web/static/scss:src/my_feed/web/static/css
 uv run my-feed serve
 ```
 
@@ -28,6 +29,18 @@ uv run my-feed serve
 - 「いま取得」→ Top 一覧 → Markdown DL → 履歴 / お気に入り
 - 要約は Gemini 3.5 Flash Lite。キー未設定なら警告してスキップ
 - 1 ソース失敗時は `source_errors` を表示（`status=partial`）
+
+### SCSS（見た目のビルド）
+
+スタイルは `src/my_feed/web/static/scss/` にあり、CSS は起動前に手動ビルドする（`serve` 内の自動ビルドはしない）。出力 `static/css/` は git 管理外。
+
+```bash
+# 一度だけ / CI 前
+uv run sassquatch src/my_feed/web/static/scss:src/my_feed/web/static/css
+
+# 開発中（別ターミナルで watch）
+uv run sassquatch src/my_feed/web/static/scss:src/my_feed/web/static/css --watch
+```
 
 オプション:
 

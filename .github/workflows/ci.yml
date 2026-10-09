@@ -70,6 +70,9 @@ jobs:
       - name: Install dependencies
         run: uv sync --extra dev
 
+      - name: Build Web CSS from SCSS
+        run: uv run sassquatch src/my_feed/web/static/scss:src/my_feed/web/static/css
+
       - name: Run tests with coverage (excluding network tests)
         run: uv run pytest tests/ -m "not network" -v
 
