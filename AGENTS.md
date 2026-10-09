@@ -46,6 +46,7 @@
 | **全体計画・マイルストーン** | [docs/plans/tech-catchup/](./docs/plans/tech-catchup/) |
 | **協働方針（進め方・学習姿勢）** | [docs/guides/collaboration.md](./docs/guides/collaboration.md) |
 | **実装ルール（base.py・境界・ドメインルール）** | [docs/guides/implementation.md](./docs/guides/implementation.md) |
+| **コードの読み順（理解するとき）** | [docs/guides/reading-order.md](./docs/guides/reading-order.md) |
 | **レビュー観点（PR前チェック）** | [docs/guides/pr-review.md](./docs/guides/pr-review.md) |
 
 ### 3.3 承認されたら小さく実装
@@ -101,6 +102,7 @@
 | 全体計画・マイルストーン | [docs/plans/tech-catchup/](./docs/plans/tech-catchup/) |
 | 進め方・学習姿勢 | [docs/guides/collaboration.md](./docs/guides/collaboration.md) |
 | 実装の具体的なルール | [docs/guides/implementation.md](./docs/guides/implementation.md) |
+| コードをどの順で読むか | [docs/guides/reading-order.md](./docs/guides/reading-order.md) |
 | PR レビュー観点 | [docs/guides/pr-review.md](./docs/guides/pr-review.md) |
 
 ---
@@ -111,3 +113,4 @@
 |------|------|
 | 2026-10-07 | 初版作成 |
 | 2026-10-07 | メタ情報とナビゲーションだけに削減。実装ルールは implementation.md に分離 |
+| 2026-10-09 | 参照先にコードの読み順（reading-order.md）を追加 |
