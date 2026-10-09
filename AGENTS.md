@@ -2,8 +2,6 @@
 
 **このドキュメントの目的**: AIエージェントが、このリポジトリで何に気をつけて振る舞うべきか、必要な情報がどこにあるかを示す。
 
-ステータス: **草案**（運用しながら改善する）
-
 ---
 
 ## 1. プロジェクト概要
@@ -105,14 +103,3 @@
 | 実装の具体的なルール | [docs/guides/implementation.md](./docs/guides/implementation.md) |
 | コードをどの順で読むか | [docs/guides/reading-order.md](./docs/guides/reading-order.md) |
 | PR レビュー観点 | [docs/guides/pr-review.md](./docs/guides/pr-review.md) |
-
----
-
-## 変更履歴
-
-| 日付 | 内容 |
-|------|------|
-| 2026-10-07 | 初版作成 |
-| 2026-10-07 | メタ情報とナビゲーションだけに削減。実装ルールは implementation.md に分離 |
-| 2026-10-09 | 参照先にコードの読み順（reading-order.md）を追加 |
-| 2026-10-09 | 計画 md をやめ、今の位置は README、未着手は Issues |
