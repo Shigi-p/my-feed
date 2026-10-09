@@ -203,8 +203,8 @@ M4-D 以降は AI 要約が自動生成されるため、手動での要約依�
 ## ドキュメント
 
 - 未着手: [GitHub Issues](https://github.com/Shigi-p/my-feed/issues)
+- 基本姿勢（エージェント）: [AGENTS.md](./AGENTS.md)
 - 実装ルール: [docs/guides/implementation.md](./docs/guides/implementation.md)
 - レビュー観点: [docs/guides/pr-review.md](./docs/guides/pr-review.md)
-- 協働方針: [docs/guides/collaboration.md](./docs/guides/collaboration.md)
 - コードの読み順: [docs/guides/reading-order.md](./docs/guides/reading-order.md)
 - 取得経路: [docs/notes/sources.md](./docs/notes/sources.md)
