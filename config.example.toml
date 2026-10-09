@@ -10,11 +10,19 @@ enabled_sources = ["zenn", "qiita", "gigazine", "github_trending"]
 recency_half_life_hours = 36
 neutral_popularity_when_missing = 0.5
 
-# AI Summarization (M4-D). Enabled by default for real-source runs.
-# Set GEMINI_API_KEY environment variable before running:
+# AI Summarization (M4-D Gemini / M4-H Ollama).
+# Default backend is Gemini. For local Ollama (after PR-2 wiring):
+#   ollama serve && ollama pull gemma4:e4b
+#   SUMMARIZER_BACKEND=ollama uv run my-feed serve
+# Set GEMINI_API_KEY when using Gemini:
 #   export GEMINI_API_KEY="your-api-key-here"
-# Technical parameters (temperature=0.3, max_output_tokens=3000, thinking_level=minimal)
-# are optimized for cost-efficiency and are hardcoded in the implementation.
+# Technical parameters are hardcoded in the implementation.
 [summarizer]
 enabled = true
+backend = "gemini"  # "gemini" | "ollama"; env SUMMARIZER_BACKEND overrides
 model = "gemini-3.5-flash-lite"
+ollama_model = "gemma4:e4b"
+
+[summarizer.ollama]
+base_url = "http://localhost:11434"
+timeout = 120

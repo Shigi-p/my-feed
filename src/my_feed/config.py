@@ -31,21 +31,45 @@ class ScoringConfig(BaseModel):
     hybrid: HybridScoringConfig = Field(default_factory=HybridScoringConfig)
 
 
+class OllamaConfig(BaseModel):
+    """Ollama HTTP API connection settings (M4-H)."""
+
+    base_url: str = "http://localhost:11434"
+    timeout: float = 120.0
+
+
 class SummarizerConfig(BaseModel):
-    """AI summarization settings (M4-D).
+    """AI summarization settings (M4-D Gemini / M4-H Ollama).
 
     Technical parameters (temperature, max_output_tokens, thinking_level) are
-    hardcoded in the implementation. Users only need to toggle enabled and
-    optionally choose a different model.
+    hardcoded in the implementation. Users only need to toggle enabled,
+    choose backend, and optionally choose a different model.
     """
 
     enabled: bool = False
+    backend: str = "gemini"  # "gemini" | "ollama"
     model: str = "gemini-3.5-flash-lite"
+    ollama_model: str = "gemma4:e4b"
     api_key_env: str = "GEMINI_API_KEY"
+    ollama: OllamaConfig = Field(default_factory=OllamaConfig)
 
     def get_api_key(self) -> str | None:
         """Read API key from environment variable."""
         return os.getenv(self.api_key_env)
+
+    def get_backend(self) -> str:
+        """Resolve summarizer backend.
+
+        Priority: ``SUMMARIZER_BACKEND`` env → ``backend`` config → ``gemini``.
+        Unknown values fall back to ``gemini``.
+        """
+        env = os.getenv("SUMMARIZER_BACKEND", "").strip().lower()
+        if env in {"gemini", "ollama"}:
+            return env
+        configured = self.backend.strip().lower()
+        if configured in {"gemini", "ollama"}:
+            return configured
+        return "gemini"
 
 
 class AppConfig(BaseModel):
