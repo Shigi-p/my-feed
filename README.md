@@ -7,6 +7,17 @@
 **M2（ローカル完成）** まで到達。localhost で実取得 → Top 10 → Markdown DL → 履歴・お気に入り（SQLite）が使える。
 次は任意の **M3**（運用改善・フィルタ等）。
 
+## 注意
+
+個人用です。第三者の利用・サポートは想定していません。ライセンスファイルは置いていません（著作権のみ。利用許諾は与えていません）。
+
+- Web UI は認証なし・`127.0.0.1` 前提。インターネットに晒さない
+- 取得の一部は非公式で、壊れたり利用規約の対象になったりし得る
+  - Zenn: サイトが使う非公式 JSON API（likes のため。RSS には無い）
+  - GitHub Trending: 公式 API が無いため HTML をパース
+  - Qiita / GIGAZINE: 公式 API / RSS
+- 経路の詳細: [docs/notes/sources.md](./docs/notes/sources.md)
+
 ## セットアップ（uv）
 
 ```bash
@@ -93,7 +104,7 @@ uv run my-feed serve
 
 - `config.local.toml` があれば Web / `load_config()` はそれを優先（無ければ `config.toml`）
 - 履歴・お気に入りは `data/my_feed.db`（再起動後も残る）
-- 認証なし・`127.0.0.1` 前提。本番公開しない
+- 認証なし・`127.0.0.1` 前提。本番公開しない（上の「注意」）
 
 ### AI要約機能（M4-D）
 
