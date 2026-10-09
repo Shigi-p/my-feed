@@ -20,3 +20,6 @@ config.local.toml
 .coverage.*
 htmlcov/
 coverage.xml
+
+# SCSS build output (see README)
+src/my_feed/web/static/css/

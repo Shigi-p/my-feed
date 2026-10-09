@@ -12,6 +12,7 @@ dependencies = [
     "jinja2>=3.1",
     "pydantic>=2.11.0",
     "python-multipart>=0.0.32",
+    "sassquatch>=1.0.1",
     "typer>=0.16.0",
     "uvicorn[standard]>=0.30",
 ]
@@ -37,6 +38,7 @@ packages = ["src/my_feed"]
 
 [tool.hatch.build.targets.wheel.force-include]
 "src/my_feed/web/templates" = "my_feed/web/templates"
+"src/my_feed/web/static" = "my_feed/web/static"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
