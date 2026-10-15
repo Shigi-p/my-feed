@@ -21,7 +21,7 @@ class GeminiSummarizer:
     - thinking_level: "minimal" (Flash-Lite のデフォルト、コスト効率的)
     - max_output_tokens: 3000 (thinking + 詳細要約に十分)
     - temperature: 1.0 (Gemini 3.x 公式デフォルト、変更禁止)
-    - timeout: 30秒 (URL Context は記事取得を含むため長め)
+    - timeout: 30秒 = 30000ms (google.genai HttpOptions はミリ秒。URL Context 込み)
     """
 
     # 技術パラメータ（要約に最適化された固定値）
@@ -29,7 +29,8 @@ class GeminiSummarizer:
     _TEMPERATURE = 1.0
     _MAX_OUTPUT_TOKENS = 3000
     _THINKING_LEVEL = "minimal"
-    _TIMEOUT_SECONDS = 30
+    # google.genai HttpOptions.timeout はミリ秒（秒ではない）
+    _TIMEOUT_MS = 30_000
 
     def __init__(
         self,
@@ -45,9 +46,11 @@ class GeminiSummarizer:
         """
         self._api_key = api_key
         self._model = model
-        # タイムアウト設定付きでクライアントを初期化
         # URL Context は記事取得も含むため、通常の API より長めに設定
-        self._client = genai.Client(api_key=api_key, http_options={"timeout": self._TIMEOUT_SECONDS})
+        self._client = genai.Client(
+            api_key=api_key,
+            http_options={"timeout": self._TIMEOUT_MS},
+        )
 
     def summarize(self, item: Item) -> str | None:
         """URL Context を使って要約を生成。
