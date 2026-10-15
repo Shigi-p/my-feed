@@ -35,6 +35,25 @@ uv run my-feed serve
 uv run my-feed serve --config config.local.toml --db data/my_feed.db
 ```
 
+### 要約の切り替え（Gemini / Ollama）
+
+既定は Gemini。自宅 PC だけ Ollama でローカル要約できる（コストゼロ。品質は Gemini より落ちる）。
+
+```bash
+# 出先（既定）
+uv run my-feed serve
+
+# 自宅
+ollama serve
+ollama pull gemma4:e4b
+SUMMARIZER_BACKEND=ollama uv run my-feed serve
+```
+
+- 優先順位: 環境変数 `SUMMARIZER_BACKEND` → `[summarizer] backend` → `gemini`
+- Ollama は記事 URL を取得して本文を渡す。取得失敗時は抜粋 → タイトル
+- Ollama 未起動なら警告して要約なしで続行（Gemini には切り替えない）
+- 接続先・タイムアウトは `[summarizer.ollama]`、モデルは `ollama_model`
+
 ## CLI
 
 ```bash
