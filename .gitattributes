@@ -1,0 +1,2 @@
+# 改行コードを LF に固定する（Windows 側 Git の core.autocrlf=true で CRLF にされるのを防ぐ）
+* text=auto eol=lf
