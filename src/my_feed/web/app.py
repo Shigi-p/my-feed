@@ -39,10 +39,7 @@ def create_app(deps: WebDeps | None = None) -> FastAPI:
     templates.env.filters["path_quote"] = lambda value: quote(str(value), safe="")
     app = FastAPI(title="my feed", docs_url=None, redoc_url=None)
     app.state.deps = deps
-    # CSS is built from SCSS into static/css/ (gitignored). Serve only the build output.
-    css_dir = STATIC_DIR / "css"
-    css_dir.mkdir(parents=True, exist_ok=True)
-    app.mount("/static/css", StaticFiles(directory=str(css_dir)), name="static-css")
+    app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
     def _latest_run_id() -> str | None:
         runs = deps.run_store.list_runs()

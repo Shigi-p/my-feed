@@ -1,4 +1,12 @@
-@use "variables";
+:root {
+  --bg: #f6f3ee;
+  --ink: #1c1a17;
+  --muted: #5c574f;
+  --line: #d8d0c4;
+  --accent: #0b6e4f;
+  --accent-ink: #f4fff9;
+  --surface: #fffdf9;
+}
 
 * {
   box-sizing: border-box;
@@ -8,9 +16,7 @@ body {
   margin: 0;
   font-family: "IBM Plex Sans", "Hiragino Sans", "Noto Sans JP", sans-serif;
   color: var(--ink);
-  background:
-    radial-gradient(ellipse 80% 50% at 10% -10%, #e7efe8 0%, transparent 55%),
-    linear-gradient(180deg, #efeae2 0%, var(--bg) 40%, #ebe4d8 100%);
+  background: radial-gradient(ellipse 80% 50% at 10% -10%, #e7efe8 0%, transparent 55%), linear-gradient(180deg, #efeae2 0%, var(--bg) 40%, #ebe4d8 100%);
   min-height: 100vh;
   line-height: 1.5;
 }
@@ -49,16 +55,14 @@ nav {
   display: flex;
   gap: 1rem;
   font-size: 0.95rem;
-
-  a {
-    text-decoration: none;
-    color: var(--muted);
-
-    &[aria-current="page"] {
-      color: var(--ink);
-      font-weight: 600;
-    }
-  }
+}
+nav a {
+  text-decoration: none;
+  color: var(--muted);
+}
+nav a[aria-current="page"] {
+  color: var(--ink);
+  font-weight: 600;
 }
 
 h1,
@@ -133,37 +137,33 @@ ul.plain {
 
 ol.feed {
   counter-reset: rank;
-
-  > li {
-    display: grid;
-    grid-template-columns: 2rem 1fr auto;
-    gap: 0.5rem 0.75rem;
-    padding: 0.85rem 0;
-    border-bottom: 1px solid var(--line);
-    align-items: start;
-
-    &::before {
-      counter-increment: rank;
-      content: counter(rank);
-      font-variant-numeric: tabular-nums;
-      color: var(--muted);
-      padding-top: 0.15rem;
-    }
-  }
+}
+ol.feed > li {
+  display: grid;
+  grid-template-columns: 2rem 1fr auto;
+  gap: 0.5rem 0.75rem;
+  padding: 0.85rem 0;
+  border-bottom: 1px solid var(--line);
+  align-items: start;
+}
+ol.feed > li::before {
+  counter-increment: rank;
+  content: counter(rank);
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+  padding-top: 0.15rem;
 }
 
 .item-main {
   min-width: 0;
-
-  a.title {
-    color: var(--ink);
-    text-decoration: none;
-    font-weight: 600;
-
-    &:hover {
-      text-decoration: underline;
-    }
-  }
+}
+.item-main a.title {
+  color: var(--ink);
+  text-decoration: none;
+  font-weight: 600;
+}
+.item-main a.title:hover {
+  text-decoration: underline;
 }
 
 .meta {
@@ -177,37 +177,33 @@ ol.feed {
   flex-direction: column;
   gap: 0.35rem;
   align-items: stretch;
-
-  form {
-    margin: 0;
-  }
-
-  button,
-  .btn {
-    font-size: 0.8rem;
-    white-space: nowrap;
-    text-align: center;
-    text-decoration: none;
-  }
+}
+.actions form {
+  margin: 0;
+}
+.actions button,
+.actions .btn {
+  font-size: 0.8rem;
+  white-space: nowrap;
+  text-align: center;
+  text-decoration: none;
 }
 
 table.history {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.95rem;
-
-  th,
-  td {
-    text-align: left;
-    padding: 0.55rem 0.35rem;
-    border-bottom: 1px solid var(--line);
-  }
-
-  th {
-    color: var(--muted);
-    font-weight: 500;
-    font-size: 0.85rem;
-  }
+}
+table.history th,
+table.history td {
+  text-align: left;
+  padding: 0.55rem 0.35rem;
+  border-bottom: 1px solid var(--line);
+}
+table.history th {
+  color: var(--muted);
+  font-weight: 500;
+  font-size: 0.85rem;
 }
 
 .toolbar {
@@ -225,21 +221,18 @@ ul.source-errors {
   background: var(--surface);
   color: var(--muted);
   font-size: 0.9rem;
-
-  li + li {
-    margin-top: 0.35rem;
-  }
-
-  strong {
-    color: var(--ink);
-  }
+}
+ul.source-errors li + li {
+  margin-top: 0.35rem;
+}
+ul.source-errors strong {
+  color: var(--ink);
 }
 
 @media (max-width: 560px) {
   ol.feed > li {
     grid-template-columns: 1.5rem 1fr;
   }
-
   .actions {
     grid-column: 2;
     flex-direction: row;
