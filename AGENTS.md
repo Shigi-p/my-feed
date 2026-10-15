@@ -51,3 +51,14 @@
 - [ ] [実装ルール](./docs/guides/implementation.md) を守っているか
 - [ ] [レビュー観点](./docs/guides/pr-review.md) の該当項目を確認したか
 - [ ] テストは書いたか（該当する場合）
+- [ ] `make ci` が通るか（初回は `uv sync --extra dev`）
+
+---
+
+## 5. Git と PR の流れ
+
+- 起点は `origin/main`。ローカルの `main` は古いことがあるので、差分比較やブランチ作成の前に `git fetch`
+- コミットは Conventional Commits（`type(scope): 日本語の要約`）。pre-commit が検査する
+- PR は [テンプレート](./.github/PULL_REQUEST_TEMPLATE.md) に沿う。関連 Issue は `Closes #N` / `Refs #N`
+- マージは squash
+- 見送った課題は PR 備考に書くだけでなく Issue に切り出す
