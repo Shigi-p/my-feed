@@ -9,7 +9,7 @@ from my_feed.config import AppConfig
 from my_feed.models import PipelineResult, PipelineStatus, ScoredItem
 from my_feed.scoring import build_scorer
 from my_feed.sources import get_source
-from my_feed.summarizer import GeminiSummarizer, SummarizerAdapter
+from my_feed.summarizer import GeminiSummarizer, OllamaSummarizer, SummarizerAdapter
 
 logger = logging.getLogger(__name__)
 
@@ -18,6 +18,14 @@ def _build_summarizer(config: AppConfig) -> SummarizerAdapter | None:
     """設定から summarizer を構築。無効または利用不可の場合は None。"""
     if not config.summarizer.enabled:
         return None
+
+    if config.summarizer.get_backend() == "ollama":
+        # 未起動でも各 summarize() が None を返すだけ。Gemini へは落とさない
+        return OllamaSummarizer(
+            model=config.summarizer.ollama_model,
+            base_url=config.summarizer.ollama.base_url,
+            timeout=config.summarizer.ollama.timeout,
+        )
 
     api_key = config.summarizer.get_api_key()
     if not api_key:
@@ -29,7 +37,6 @@ def _build_summarizer(config: AppConfig) -> SummarizerAdapter | None:
         )
         return None
 
-    # Currently only Gemini is supported
     return GeminiSummarizer(
         api_key=api_key,
         model=config.summarizer.model,
@@ -72,7 +79,7 @@ def run_pipeline(config: AppConfig) -> PipelineResult:
         # Summarize top N items (M4-D)
         summarizer = _build_summarizer(config)
         if summarizer:
-            logger.info(f"Summarizing {len(scored)} items with {config.summarizer.model}")
+            logger.info(f"Summarizing {len(scored)} items with {config.summarizer.get_backend()}")
             for scored_item in scored:
                 summary = summarizer.summarize(scored_item.item)
                 scored_item.summary = summary
