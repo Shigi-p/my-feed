@@ -7,12 +7,15 @@ from urllib.parse import quote
 
 from fastapi import FastAPI, Form, HTTPException, Request
 from fastapi.responses import HTMLResponse, RedirectResponse, Response
+from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 from my_feed.models import RenderMeta, SourceName
 from my_feed.web.deps import WebDeps, create_default_web_deps
 
-TEMPLATES_DIR = Path(__file__).resolve().parent / "templates"
+_WEB_DIR = Path(__file__).resolve().parent
+TEMPLATES_DIR = _WEB_DIR / "templates"
+STATIC_DIR = _WEB_DIR / "static"
 
 
 def _safe_next_url(next_url: str, *, default: str = "/") -> str:
@@ -36,6 +39,7 @@ def create_app(deps: WebDeps | None = None) -> FastAPI:
     templates.env.filters["path_quote"] = lambda value: quote(str(value), safe="")
     app = FastAPI(title="my feed", docs_url=None, redoc_url=None)
     app.state.deps = deps
+    app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
     def _latest_run_id() -> str | None:
         runs = deps.run_store.list_runs()

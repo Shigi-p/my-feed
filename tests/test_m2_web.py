@@ -185,3 +185,21 @@ def test_fetch_form_defaults_to_hybrid_when_no_result():
     home = client.get("/")
     assert home.status_code == 200
     assert 'value="hybrid" selected' in home.text or 'value="hybrid" selected' in home.text
+
+
+def test_stylesheet_is_linked_and_served():
+    deps = WebDeps(
+        run_store=InMemoryRunStore(),
+        favorite_store=InMemoryFavoriteStore(),
+        load_config_fn=lambda _path=None: AppConfig(
+            top_n=10,
+            default_scorer="fake",
+            enabled_sources=[SourceName.FAKE],
+        ),
+        config_path=Path("config.toml"),
+    )
+    client = TestClient(create_app(deps))
+    assert 'href="/static/css/style.css"' in client.get("/").text
+    css = client.get("/static/css/style.css")
+    assert css.status_code == 200
+    assert "--accent" in css.text

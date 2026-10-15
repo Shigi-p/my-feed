@@ -1,3 +1,4 @@
+{% from "macros.html" import action_buttons %}
 {% if not result or not result.items %}
 <p class="muted">まだ取得結果がありません。「いま取得」でパイプラインを実行します。</p>
 {% else %}
@@ -16,22 +17,13 @@
       </div>
       {% endif %}
     </div>
-    <div class="actions">
-      {% if favorite_ids.get(item.id) %}
-      <form method="post" action="/favorites/{{ favorite_ids[item.id] }}/delete">
-        <input type="hidden" name="next" value="{{ request.url.path }}">
-        <button type="submit" class="ghost">お気に入り解除</button>
-      </form>
-      {% else %}
-      <form method="post" action="/favorites">
-        <input type="hidden" name="run_id" value="{{ run_id }}">
-        <input type="hidden" name="item_id" value="{{ item.id }}">
-        <input type="hidden" name="next" value="{{ request.url.path }}">
-        <button type="submit" class="ghost">お気に入り</button>
-      </form>
-      {% endif %}
-      <a class="btn ghost" href="/runs/{{ run_id }}/items/{{ item.id|path_quote }}/markdown">MD</a>
-    </div>
+    {{ action_buttons(
+      next_url=request.url.path,
+      favorite_id=favorite_ids.get(item.id),
+      run_id=run_id,
+      item_id=item.id,
+      show_markdown=true
+    ) }}
   </li>
   {% endfor %}
 </ol>
